@@ -23,26 +23,40 @@ export class WindowLocationEventGenerator {
 
     private readonly windowReference: number
 
+    private readonly locationSupplier: () => Location
+
     private readonly eventComsumer: (e: WindowLocationEvent) => void
+
+    private readonly pollingInterval: number
 
     private lastLocation: string = ''
 
-    constructor(windowReference: number, eventComsumer: (e: WindowLocationEvent) => void) {
-        this.windowReference = windowReference
-        this.eventComsumer = eventComsumer
+    private continue = true
 
-        window.setTimeout(() => this.onTimer(), 1)
+    constructor(windowReference: number, locationSupplier: () => Location, eventComsumer: (e: WindowLocationEvent) => void, pollingInterval: number = 250) {
+        this.windowReference = windowReference
+        this.locationSupplier = locationSupplier
+        this.eventComsumer = eventComsumer
+        this.pollingInterval = pollingInterval
+
+        setTimeout(() => this.onTimer(), 1)
     }
 
     private onTimer(): void {
-        const currentLocation = window.location.href
+        const currentLocation = this.locationSupplier().href
 
         if (currentLocation !== this.lastLocation) {
             this.lastLocation = currentLocation
-            this.eventComsumer(createWindowLocationEvent(this.windowReference, () => window.location))
+            this.eventComsumer(createWindowLocationEvent(this.windowReference, () => this.locationSupplier()))
         }
 
-        window.setTimeout(() => this.onTimer(), 250)
+        if (this.continue) {
+            setTimeout(() => this.onTimer(), this.pollingInterval)
+        }
+    }
+
+    stop(): void {
+        this.continue = false
     }
 
 }
