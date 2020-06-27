@@ -1,0 +1,18 @@
+{
+    "name": "sensor@weaklayer.com",
+    "description": "Weaklayer Sensor configuration",
+    "type": "storage",
+    "data": {
+        "api": {
+            "protocol": "http",
+            "hostname": "localhost",
+            "port": 8080
+        },
+        "installKey": {
+            "group": "68886d61-572b-41a5-8edd-93a564fb5ba3",
+            "secret": "jTbup3jD+nWFRw2LW5k6v0dP+qf6cWXsc3IazN39GnaMeKEp13kpyh6AJFo3V1ckeD3dt0JXfoqmeOWr2jU29Q==",
+            "checksum": "jvqWXRmh9JAnbwDS19W59lOJXD2dZuRglhFtsJzDedU="
+        },
+        "label": "Mitch-Desktop"
+    }
+}

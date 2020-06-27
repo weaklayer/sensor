@@ -1,0 +1,85 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "description": "Weaklayer sensor configuration data",
+    "type": "object",
+    "required": [
+        "api",
+        "installKey",
+        "label"
+    ],
+    "properties": {
+        "api": {
+            "type": "object",
+            "description": "The API endpoint that the sensor should contact.",
+            "required": [
+                "protocol",
+                "hostname",
+                "port"
+            ],
+            "properties": {
+                "protocol": {
+                    "type": "string",
+                    "enum": [
+                        "http",
+                        "https"
+                    ],
+                    "description": "The sensor api protocol. http or https."
+                },
+                "hostname": {
+                    "type": "string",
+                    "anyOf": [
+                        {
+                            "format": "idn-hostname"
+                        },
+                        {
+                            "format": "hostname"
+                        },
+                        {
+                            "format": "ipv4"
+                        },
+                        {
+                            "format": "ipv6"
+                        }
+                    ],
+                    "description": "The sensor api endpoint hostname."
+                },
+                "port": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 65535,
+                    "description": "The sensor api endpoint port."
+                }
+            }
+        },
+        "installKey": {
+            "type": "object",
+            "description": "The installation secret that the sensor uses to enroll.",
+            "required": [
+                "group",
+                "secret",
+                "checksum"
+            ],
+            "properties": {
+                "group": {
+                    "type": "string",
+                    "description": "The group that the sensor will enroll under.",
+                    "format": "uuid"
+                },
+                "secret": {
+                    "type": "string",
+                    "description": "Base64 encoded 512-bit secret that acts as a password for the sensor to enroll in the above group.",
+                    "pattern": "^[A-Za-z0-9+/]{86}==$"
+                },
+                "checksum": {
+                    "type": "string",
+                    "description": "Base64 encoded 32-bit checksum value that ensures the groupId and secret were entered correctly.",
+                    "pattern": "^[A-Za-z0-9+/]{43}=$"
+                }
+            }
+        },
+        "label": {
+            "type": "string",
+            "description": "A label that is applied to the sensor at installation. "
+        }
+    }
+}

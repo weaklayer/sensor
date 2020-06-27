@@ -1,0 +1,40 @@
+{
+  "name": "Weaklayer Sensor",
+  "author": "Weaklayer",
+  "version": "1.0.0",
+  "description": "Browser Detection and Response",
+  "manifest_version": 2,
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "incognito": "spanning",
+  "background": {
+    "scripts": [
+      "browser-polyfill.min.js",
+      "background.js"
+    ],
+    "persistent": true
+  },
+  "content_scripts": [
+    {
+      "js": [
+        "browser-polyfill.min.js",
+        "content.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "permissions": [
+    "storage",
+    "<all_urls>"
+  ],
+  "storage": {
+    "managed_schema": "managed-storage-schema.json"
+  },
+  "minimum_chrome_version": "51"
+}
