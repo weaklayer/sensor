@@ -28,4 +28,4 @@ const contentHub = new ContentHub()
 
 contentHub.submitEvent(windowEvent)
 
-const windowLocationEventGenerator = new WindowLocationEventGenerator(windowEvent.time, (e) => contentHub.submitEvent(e))
+const windowLocationEventGenerator = new WindowLocationEventGenerator(windowEvent.time, () => window.location, (e) => contentHub.submitEvent(e))
