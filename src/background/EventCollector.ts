@@ -23,40 +23,46 @@ export class EventCollector {
 
     private readonly eventsConsumer: (es: Array<Event>) => Promise<void>
 
+    private readonly overallTimeout: number
+
+    private readonly immediateTimeout: number
+
     private events: Array<Event> = new Array<Event>()
 
-    private overallTimeout: number | undefined = undefined
+    private overallTimer: number | undefined = undefined
 
-    private immediateTimeout: number | undefined = undefined
+    private immediateTimer: number | undefined = undefined
 
-    constructor(eventsConsumer: (es: Array<Event>) => Promise<void>) {
+    constructor(eventsConsumer: (es: Array<Event>) => Promise<void>, overallTimeout: number = 5000, immediateTimeout: number = 500) {
         this.eventsConsumer = eventsConsumer
+        this.overallTimeout = overallTimeout
+        this.immediateTimeout = immediateTimeout
     }
 
-    comsumeEvent(event: Event): void {
+    comsumeEvent(event: Event, w: WindowOrWorkerGlobalScope = window): void {
         this.events.push(event)
 
-        if (!this.overallTimeout) {
+        if (!this.overallTimer) {
             // Hold onto events for 5s max before sending them off
-            this.overallTimeout = window.setTimeout(() => this.processEvents(), 5000)
+            this.overallTimer = w.setTimeout(() => this.processEvents(w), this.overallTimeout)
         }
 
-        if (this.immediateTimeout) {
-            window.clearTimeout(this.immediateTimeout)
+        if (this.immediateTimer) {
+            w.clearTimeout(this.immediateTimer)
         }
         // Events can come in 500ms apart and they will get buffered
-        this.immediateTimeout = window.setTimeout(() => this.processEvents(), 500)
+        this.immediateTimer = w.setTimeout(() => this.processEvents(w), this.immediateTimeout)
     }
 
-    private async processEvents(): Promise<void> {
-        if (this.overallTimeout) {
-            window.clearTimeout(this.overallTimeout)
-            this.overallTimeout = undefined
+    private async processEvents(w: WindowOrWorkerGlobalScope): Promise<void> {
+        if (this.overallTimer) {
+            w.clearTimeout(this.overallTimer)
+            this.overallTimer = undefined
         }
 
-        if (this.immediateTimeout) {
-            window.clearTimeout(this.immediateTimeout)
-            this.immediateTimeout = undefined
+        if (this.immediateTimer) {
+            w.clearTimeout(this.immediateTimer)
+            this.immediateTimer = undefined
         }
 
         const eventsCapture = this.events
