@@ -1,0 +1,9 @@
+{
+    "cache": false,
+    "exclude": [
+        "**/*.spec.ts"
+    ],
+    "extensions": [
+        ".ts"
+    ]
+}

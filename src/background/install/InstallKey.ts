@@ -41,21 +41,10 @@ export function normalizeInstallKey(installKey: InstallKey): InstallKey {
 
 export function isInstallKey(data: any): data is InstallKey {
     const validGroup: boolean = 'group' in data && typeof data.group === 'string' && uuidRegex.test(data.group)
-    if (!validGroup) {
-        return false
-    }
-
     const validSecret: boolean = 'secret' in data && typeof data.secret === 'string' && secretRegex.test(data.secret)
-    if (!validSecret) {
-        return false
-    }
-
     const validCheckSum: boolean = 'checksum' in data && typeof data.checksum === 'string' && checksumRegex.test(data.checksum)
-    if (!validCheckSum) {
-        return false
-    }
 
-    return true
+    return validGroup && validSecret && validCheckSum
 }
 
 export async function isChecksumValid(installKey: InstallKey): Promise<boolean> {

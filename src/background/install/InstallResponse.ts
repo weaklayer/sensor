@@ -39,24 +39,9 @@ export function normalizeInstallResponse(installResponse: InstallResponse): Inst
 
 export function isInstallResponse(data: any): data is InstallResponse {
     const validToken: boolean = 'token' in data && typeof data.token === 'string' && tokenRegex.test(data.token)
-    if (!validToken) {
-        return false
-    }
-
     const validSensorId: boolean = 'sensor' in data && typeof data.sensor === 'string' && sensorRegex.test(data.sensor)
-    if (!validSensorId) {
-        return false
-    }
-
     const validExpiresAt: boolean = 'expiresAt' in data && typeof data.expiresAt === 'number' && Number.isInteger(data.expiresAt) && data.expiresAt >= 0
-    if (!validExpiresAt) {
-        return false
-    }
-
     const validIssuedAt: boolean = 'issuedAt' in data && typeof data.issuedAt === 'number' && Number.isInteger(data.issuedAt) && data.issuedAt >= 0
-    if (!validExpiresAt) {
-        return false
-    }
 
     return true
 }
