@@ -2,12 +2,12 @@
     "browser_specific_settings": {
         "gecko": {
             "id": "sensor@weaklayer.com",
-            "strict_min_version": "54.0"
+            "strict_min_version": "57.0"
         }
     },
     "name": "Weaklayer Sensor",
     "author": "Weaklayer",
-    "version": "1.0.0",
+    "version": "0.0.1",
     "description": "Browser Detection and Response",
     "manifest_version": 2,
     "icons": {

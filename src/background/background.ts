@@ -23,25 +23,18 @@ import { BackgroundHub } from './BackgroundHub'
 import { EventCollector } from './EventCollector'
 
 console.info(`
-This is Weaklayer Sensor.
+Weaklayer Sensor is available under the terms of the GNU Affero General Public License (GNU AGPL).
+Please see the program source for the exact GNU AGPL version.
 
-Weaklayer Sensor is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+The Weaklayer Sensor source is available at https://github.com/weaklayer/sensor
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+The Weaklayer Gateway source is available at https://github.com/weaklayer/gateway
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
+For more information, please see https://weaklayer.com
 `)
 
-const enroller = new Installer()
-const sensorEventApi = new SensorEventAPI(enroller)
+const installer = new Installer()
+const sensorEventApi = new SensorEventAPI(installer)
 
 const eventCollector = new EventCollector((es) => sensorEventApi.submit(es))
 const eventHub = new BackgroundHub((e) => eventCollector.comsumeEvent(e))
@@ -49,6 +42,6 @@ const eventHub = new BackgroundHub((e) => eventCollector.comsumeEvent(e))
 // Manually trigger an auth token get on startup
 // This will force any required network calls
 // So the token is present locally when it is needed.
-enroller.getAuthorizationToken().then(() => {
+installer.getAuthorizationToken().then(() => {
     console.info('Authorization token present.')
 })

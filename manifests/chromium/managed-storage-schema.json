@@ -53,7 +53,7 @@
         },
         "installKey": {
             "type": "object",
-            "description": "The installation secret that the sensor uses to enroll.",
+            "description": "The key that the sensor uses to install.",
             "required": [
                 "group",
                 "secret",
@@ -62,12 +62,12 @@
             "properties": {
                 "group": {
                     "type": "string",
-                    "description": "The group that the sensor will enroll under.",
+                    "description": "The group that the sensor will install under.",
                     "format": "uuid"
                 },
                 "secret": {
                     "type": "string",
-                    "description": "Base64 encoded 512-bit secret that acts as a password for the sensor to enroll in the above group.",
+                    "description": "Base64 encoded 512-bit secret that acts as a password for the sensor to install in the above group.",
                     "pattern": "^[A-Za-z0-9+/]{86}==$"
                 },
                 "checksum": {
