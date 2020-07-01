@@ -4,8 +4,8 @@ What follows are the names, source code locations and licenses for the Weaklayer
 =================================================================================================
 
 Weaklayer Sensor
-version 0.0.1
-source: https://github.com/weaklayer/sensor/tree/v0.0.1
+version 0.0.2
+source: https://github.com/weaklayer/sensor/tree/v0.0.2
 
 Weaklayer Sensor is available under the terms of the GNU Affero General Public License (GNU AGPL).
 A copy of this license is present in the LICENSE file.
