@@ -30,7 +30,6 @@ module.exports = {
     new CopyWebpackPlugin({
       patterns: [
         { from: 'LICENSE' },
-        { from: 'NOTICES' },
         { from: 'node_modules/webextension-polyfill/dist/browser-polyfill.min.js' },
         { from: 'node_modules/webextension-polyfill/dist/browser-polyfill.min.js.map' },
         { from: 'icon16.png' },

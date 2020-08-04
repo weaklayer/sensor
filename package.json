@@ -8,11 +8,12 @@
     "dist"
   ],
   "scripts": {
-    "wipe": "rm -rf node_modules",
-    "clean": "rm -rf ./dist",
+    "wipe": "npm run clean && rm -rf node_modules",
+    "clean": "rm -rf ./dist && rm -rf ./.licenses",
     "build": "npm run clean && webpack --config webpack.config.js ",
     "build-firefox": "npm run build && cp manifests/firefox/* dist/",
     "build-chromium": "npm run build && cp manifests/chromium/* dist/",
+    "package": "licensed cache && licensed status && licensed notices && cp .licenses/NOTICE dist/ && cd dist && zip -r weaklayer-sensor-binary-release.zip ./",
     "test": "nyc mocha"
   },
   "devDependencies": {
