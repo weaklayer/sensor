@@ -1,7 +1,7 @@
 {
   "name": "@weaklayer/sensor",
   "description": "Browser Detection and Response",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "license": "AGPL-3.0-or-later",
   "private": true,
   "files": [
@@ -12,7 +12,7 @@
     "clean": "rm -rf ./dist && rm -rf ./.licenses",
     "build": "npm run clean && webpack --config webpack.config.js ",
     "build-firefox": "npm run build && cp manifests/firefox/* dist/",
-    "build-chromium": "npm run build && cp manifests/chromium/* dist/",
+    "build-chrome": "npm run build && cp manifests/chrome/* dist/",
     "package": "licensed cache && licensed status && licensed notices && cp .licenses/NOTICE dist/ && cd dist && zip -r weaklayer-sensor-binary-release.zip ./",
     "test": "nyc mocha"
   },
