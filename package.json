@@ -13,6 +13,7 @@
     "build": "npm run clean && webpack --config webpack.config.js ",
     "build-firefox": "npm run build && cp manifests/firefox/* dist/",
     "build-chrome": "npm run build && cp manifests/chrome/* dist/",
+    "build-edge": "npm run build && cp manifests/edge/* dist/",
     "package": "licensed cache && licensed status && licensed notices && cp .licenses/NOTICE dist/ && cd dist && zip -r weaklayer-sensor-binary-release.zip ./",
     "test": "nyc mocha"
   },
