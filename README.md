@@ -5,11 +5,7 @@ Weaklayer is a software system for Browser Detection and Response - like Endpoin
 The Weaklayer Sensor (a browser extension) collects and sends security data to a Weaklayer Gateway instance you are running.
 
 The Weaklayer Sensor is written against the WebExtensions API using the [Mozilla WebExtension Polyfill](https://github.com/mozilla/webextension-polyfill).
-<<<<<<< HEAD
-Here is a compatibility table for Weaklayer Sensor and the browsers that implement this technology.
-=======
 Here is a compatibility table for the Weaklayer Sensor and the browsers that implement this technology.
->>>>>>> Delete configuration information
 
 | Browser | Supported | Minimum Version | Store Link | Notes |
 |---------|-----------|-----------------|------------|-------|
