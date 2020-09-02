@@ -9,11 +9,11 @@ Here is a compatibility table for the Weaklayer Sensor and the browsers that imp
 
 | Browser | Supported | Minimum Version | Store Link | Notes |
 |---------|-----------|-----------------|------------|-------|
-| Firefox (Desktop)  | &#x2611; | 57.0  | [Mozilla Addons Store](https://addons.mozilla.org/firefox/addon/weaklayer-sensor/)   | - |
+| Firefox (Desktop)  | &#x2611; | 57  | [Mozilla Addons Store](https://addons.mozilla.org/firefox/addon/weaklayer-sensor/)   | - |
 | Firefox (Android)  | &#x2612; | - | - | Firefox on Android does support extensions, but it does not support the [Managed Storage API](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/storage/managed). |
-| Chrome | &#x2611; | 51.0 | [Chrome Web Store](https://chrome.google.com/webstore/detail/weaklayer-sensor/joancbgicjhnjkkknlpablgmdcgcpnhj) | - |
-| Edge | &#x2612; | - | - | Chromium-based Edge is in the works. |
-| Opera | &#x2612; | - | - | Opera does not support the [Managed Storage API](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/storage/managed) according to MDN. It might work still since Opera is Chromium-based. Create a Github issue if this is important to you. |
+| Chrome | &#x2611; | 51 | [Chrome Web Store](https://chrome.google.com/webstore/detail/weaklayer-sensor/joancbgicjhnjkkknlpablgmdcgcpnhj) | - |
+| Edge | &#x2611; | 79 | [Microsoft Store for Edge](https://microsoftedge.microsoft.com/addons/detail/weaklayer-sensor/kngkbghmgoehankpjifhjjglibcickjb) | Edge on MacOS support is not available since managed storage is not functioning as expected on this platform. |
+| Opera | &#x2612; | - | - | Opera does not support the [Managed Storage API](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/storage/managed) according to MDN. It might work still since Opera is Chromium-based. Please create a Github issue if this is important to you. |
 | Safari | &#x2612; | - | - | Safari 14 will have WebExtensions so this should be possible in the future. |
 
 ## Usage
