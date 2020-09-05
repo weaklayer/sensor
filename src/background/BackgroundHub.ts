@@ -19,6 +19,8 @@
 
 import { windowEventType, isWindowEvent, normalizeWindowEvent } from '../common/events/WindowEvent'
 import { windowLocationEventType, isWindowLocationEvent, normalizeWindowLocationEvent } from '../common/events/WindowLocationEvent'
+import { textInputEventType, isTextInputEvent, normalizeTextInputEvent } from '../common/events/TextInputEvent'
+
 import { Event, isEvent } from '../common/events/Event'
 
 export class BackgroundHub {
@@ -36,12 +38,14 @@ export class BackgroundHub {
         const vMap = new Map<string, (e: Event) => boolean>()
         vMap.set(windowEventType, (e: any) => isWindowEvent(e))
         vMap.set(windowLocationEventType, (e: any) => isWindowLocationEvent(e))
+        vMap.set(textInputEventType, (e: any) => isTextInputEvent(e))
         this.verifierMap = vMap
 
         const nMap = new Map<string, (e: Event) => Event>()
         nMap.set
         nMap.set(windowEventType, (e: any) => normalizeWindowEvent(e))
         nMap.set(windowLocationEventType, (e: any) => normalizeWindowLocationEvent(e))
+        nMap.set(textInputEventType, (e: any) => normalizeTextInputEvent(e))
         this.normalizerMap = nMap
     }
 
@@ -49,7 +53,7 @@ export class BackgroundHub {
         if (port.name === "EventPort") {
             port.onMessage.addListener((event) => this.verifyAndHandle(event))
         } else {
-            console.warn(`Wiring requested for unkown port type`)
+            console.warn(`Wiring requested for unknown port type`)
         }
     }
 
@@ -64,7 +68,7 @@ export class BackgroundHub {
                     console.warn(`Invalid event of type ${event.type} sent from content script`)
                 }
             } else {
-                console.warn(`Uknown event type ${event.type} sent from content script`)
+                console.warn(`Unknown event type ${event.type} sent from content script`)
             }
         }
 

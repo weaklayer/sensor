@@ -20,6 +20,11 @@
 import { ContentHub } from './ContentHub'
 import { WindowEvent, createWindowEvent } from '../common/events/WindowEvent'
 import { WindowLocationEventGenerator } from './WindowLocationEventGenerator'
+import { DocumentCrawler } from './DocumentCrawler'
+import { TextInputElementManager } from './text/TextInputElementManager'
+import { TextInputEvent } from '../common/events/TextInputEvent'
+
+console.info("Weaklayer content script loaded.")
 
 // We hold onto this event here as most events in this window will link to it
 const windowEvent: WindowEvent = createWindowEvent()
@@ -29,3 +34,15 @@ const contentHub = new ContentHub()
 contentHub.submitEvent(windowEvent)
 
 const windowLocationEventGenerator = new WindowLocationEventGenerator(windowEvent.time, () => window.location, (e) => contentHub.submitEvent(e))
+
+const textInputElementManager = new TextInputElementManager(
+    () => windowLocationEventGenerator.getCurrentWindowLocationReference(),
+    (event: TextInputEvent) => contentHub.submitEvent(event)
+)
+
+const documentCrawler = new DocumentCrawler([(node: Node) => textInputElementManager.processNode(node)])
+
+// DOM needs to finish loading before we crawl it
+window.addEventListener('DOMContentLoaded', (e) => {
+    documentCrawler.crawl()
+})

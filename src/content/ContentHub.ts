@@ -24,7 +24,7 @@ export class ContentHub {
     private readonly eventPort: browser.runtime.Port
 
     constructor() {
-        this.eventPort = browser.runtime.connect(undefined, { name: "EventPort" })
+        this.eventPort = browser.runtime.connect({ name: "EventPort" })
     }
 
     submitEvent(event: Event): void {
