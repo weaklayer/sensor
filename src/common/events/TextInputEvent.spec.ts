@@ -24,7 +24,7 @@ import { test, suite } from 'mocha'
 suite('TextInputEvent', () => {
 
     test('TextInputEvent verification', () => {
-        const event1: TextInputEvent = createTextInputEvent('hello', 'password', 2)
+        const event1: TextInputEvent = createTextInputEvent('hello', 'password', 2, 5)
         assert.isTrue(isTextInputEvent(event1), "Valid event identified as invalid")
 
         const event2: TextInputEvent = {

@@ -27,6 +27,7 @@ export interface TextInputEvent extends Event {
     hash?: string // this can be undefined because it will start as undefined and be calculated later
     inputElementType: string
     windowLocationReference: number
+    inputElementReference?: number
 }
 
 export function isTextInputEvent(data: any): data is TextInputEvent {
@@ -41,9 +42,12 @@ export function isTextInputEvent(data: any): data is TextInputEvent {
     const validInputElementType: boolean = 'inputElementType' in data && typeof data.inputElementType === 'string'
     const validWindowLocationReference: boolean = 'windowLocationReference' in data && typeof data.windowLocationReference === 'number' && isEventTime(data.windowLocationReference)
 
+    const inputElementReferencePresent: boolean = 'inputElementReference' in data && typeof data.inputElementReference !== 'undefined'
+    const validInputElementReference = !inputElementReferencePresent || (inputElementReferencePresent && typeof data.inputElementReference === 'number' && isEventTime(data.inputElementReference))
+
     const textXorHashPresent: boolean = ((textPresent || !hashPresent) || (!textPresent || hashPresent))
 
-    return validEvent && validText && validHash && textXorHashPresent && validInputElementType && validWindowLocationReference
+    return validEvent && validText && validHash && textXorHashPresent && validInputElementType && validWindowLocationReference && validInputElementReference
 }
 
 export function normalizeTextInputEvent(event: TextInputEvent): TextInputEvent {
@@ -53,17 +57,19 @@ export function normalizeTextInputEvent(event: TextInputEvent): TextInputEvent {
         text: event.text,
         hash: event.hash,
         inputElementType: event.inputElementType,
-        windowLocationReference: event.windowLocationReference
+        windowLocationReference: event.windowLocationReference,
+        inputElementReference: event.inputElementReference
     }
 }
 
-export function createTextInputEvent(text: string, inputElementType: string, windowLocationReference: number): TextInputEvent {
+export function createTextInputEvent(text: string, inputElementType: string, windowLocationReference: number, inputElementReference: number): TextInputEvent {
 
     return {
         type: textInputEventType,
         time: getEventTime(),
         text: text,
         inputElementType: inputElementType,
-        windowLocationReference: windowLocationReference
+        windowLocationReference: windowLocationReference,
+        inputElementReference: inputElementReference
     }
 }

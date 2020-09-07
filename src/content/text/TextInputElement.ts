@@ -18,6 +18,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { TextInputEvent, createTextInputEvent } from '../../common/events/TextInputEvent'
+import { getEventTime } from '../../common/events/Event'
 
 export class TextInputElement {
 
@@ -27,16 +28,20 @@ export class TextInputElement {
 
     private readonly textInputEventConsumer: (e: TextInputEvent) => void
 
+    private readonly textInputElementReference: number
+
     constructor(element: HTMLTextAreaElement | HTMLInputElement, windowLocationEventTimestampProducer: () => number, textInputEventConsumer: (e: TextInputEvent) => void) {
         this.element = element
         this.windowLocationEventTimestampProducer = windowLocationEventTimestampProducer
         this.textInputEventConsumer = textInputEventConsumer
 
+        this.textInputElementReference = getEventTime()
+
         element.addEventListener("input", (e) => this.inputChangeHandler())
     }
 
     private inputChangeHandler(): void {
-        const event = createTextInputEvent(this.element.value, this.element.type, this.windowLocationEventTimestampProducer())
+        const event = createTextInputEvent(this.element.value, this.element.type, this.windowLocationEventTimestampProducer(), this.textInputElementReference)
         this.textInputEventConsumer(event)
     }
 }

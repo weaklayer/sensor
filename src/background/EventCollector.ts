@@ -33,7 +33,7 @@ export class EventCollector {
 
     private immediateTimer: number | undefined = undefined
 
-    constructor(eventsConsumer: (es: Array<Event>) => Promise<void>, overallTimeout: number = 5000, immediateTimeout: number = 500) {
+    constructor(eventsConsumer: (es: Array<Event>) => Promise<void>, overallTimeout: number = 10000, immediateTimeout: number = 1000) {
         this.eventsConsumer = eventsConsumer
         this.overallTimeout = overallTimeout
         this.immediateTimeout = immediateTimeout

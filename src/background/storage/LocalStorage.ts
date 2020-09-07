@@ -19,7 +19,7 @@
 
 import { assert } from "../../common/utils/Assert"
 
-import { setStorageValue, getStorageValue } from './Storage'
+import { setStorageValue, getStorageValue, clearStorageValue } from './Storage'
 import { InstallResponse, isInstallResponse, normalizeInstallResponse } from "../install/InstallResponse"
 
 export class LocalStorage {
@@ -27,6 +27,7 @@ export class LocalStorage {
     private constructor() { }
 
     private static readonly installInfoKey = 'installInfo'
+    private static readonly textHashKeyKey = 'textHashKey'
 
     static async getInstallInfo(): Promise<InstallResponse> {
         const storageValue = await getStorageValue(LocalStorage.installInfoKey, k => browser.storage.local.get(k))
@@ -37,4 +38,19 @@ export class LocalStorage {
     static async setInstallInfo(installInfo: InstallResponse): Promise<void> {
         return setStorageValue(LocalStorage.installInfoKey, installInfo, (i) => browser.storage.local.set(i))
     }
+
+    static async getTextHashKey(): Promise<Uint8Array> {
+        const storageValue = await getStorageValue(LocalStorage.textHashKeyKey, k => browser.storage.local.get(k))
+        assert(storageValue instanceof Uint8Array && storageValue.length === 64, `Value set for ${LocalStorage.textHashKeyKey} in local storage does not conform to the expected schema.`)
+        return storageValue
+    }
+
+    static async setTextHashKey(textHashKey: Uint8Array): Promise<void> {
+        return setStorageValue(LocalStorage.textHashKeyKey, textHashKey, (i) => browser.storage.local.set(i))
+    }
+
+    static async clearTextHashKey(): Promise<void> {
+        return clearStorageValue(LocalStorage.textHashKeyKey, k => browser.storage.local.remove(k))
+    }
+
 }

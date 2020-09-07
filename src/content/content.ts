@@ -24,11 +24,8 @@ import { DocumentCrawler } from './DocumentCrawler'
 import { TextInputElementManager } from './text/TextInputElementManager'
 import { TextInputEvent } from '../common/events/TextInputEvent'
 
-console.info("Weaklayer content script loaded.")
-
 // We hold onto this event here as most events in this window will link to it
 const windowEvent: WindowEvent = createWindowEvent()
-
 const contentHub = new ContentHub()
 
 contentHub.submitEvent(windowEvent)

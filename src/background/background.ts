@@ -20,6 +20,11 @@
 import { Installer } from './install/Installer'
 import { SensorEventAPI } from './SensorEventAPI'
 import { BackgroundHub } from './BackgroundHub'
+import { HashKeyManager } from './text/HashKeyManager'
+import { KeyedHasher } from './text/KeyedHasher'
+import { TextInputSessionManager } from './text/TextInputSessionManager'
+import { TextInputEventFinalizer } from './text/TextInputEventFinalizer'
+import { TextInputEvent, isTextInputEvent } from '../common/events/TextInputEvent'
 import { EventCollector } from './EventCollector'
 
 console.info(`
@@ -35,9 +40,26 @@ For more information, please see https://weaklayer.com
 
 const installer = new Installer()
 const sensorEventApi = new SensorEventAPI(installer)
-
 const eventCollector = new EventCollector((es) => sensorEventApi.submit(es))
-const eventHub = new BackgroundHub((e) => eventCollector.comsumeEvent(e))
+
+const textHashKeyManager = new HashKeyManager()
+const textHasher: KeyedHasher = new KeyedHasher(() => textHashKeyManager.getHashKey())
+const textInputEventFinalizer = new TextInputEventFinalizer(textHasher)
+const textInputSessionManager: TextInputSessionManager = new TextInputSessionManager(5000, 300000, async (events: Array<TextInputEvent>) => {
+    const processedEvents = await textInputEventFinalizer.processTextInputEvents(events)
+    processedEvents.forEach(e => {
+        eventCollector.comsumeEvent(e)
+    })
+})
+
+
+const eventHub = new BackgroundHub((e) => {
+    if (isTextInputEvent(e)) {
+        textInputSessionManager.trackTextInput(e)
+    } else {
+        eventCollector.comsumeEvent(e)
+    }
+})
 
 // Manually trigger an auth token get on startup
 // This will force any required network calls
