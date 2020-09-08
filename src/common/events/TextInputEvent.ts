@@ -26,8 +26,8 @@ export interface TextInputEvent extends Event {
     text?: string // this can be undefined because we want to remove it from the event after a hash is calculated
     hash?: string // this can be undefined because it will start as undefined and be calculated later
     inputElementType: string
+    inputElementReference: number
     windowLocationReference: number
-    inputElementReference?: number
 }
 
 export function isTextInputEvent(data: any): data is TextInputEvent {
@@ -42,8 +42,7 @@ export function isTextInputEvent(data: any): data is TextInputEvent {
     const validInputElementType: boolean = 'inputElementType' in data && typeof data.inputElementType === 'string'
     const validWindowLocationReference: boolean = 'windowLocationReference' in data && typeof data.windowLocationReference === 'number' && isEventTime(data.windowLocationReference)
 
-    const inputElementReferencePresent: boolean = 'inputElementReference' in data && typeof data.inputElementReference !== 'undefined'
-    const validInputElementReference = !inputElementReferencePresent || (inputElementReferencePresent && typeof data.inputElementReference === 'number' && isEventTime(data.inputElementReference))
+    const validInputElementReference = 'inputElementReference' in data && typeof data.inputElementReference === 'number' && isEventTime(data.inputElementReference)
 
     const textXorHashPresent: boolean = ((textPresent || !hashPresent) || (!textPresent || hashPresent))
 

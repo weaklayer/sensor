@@ -18,19 +18,21 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { windowEventType, isWindowEvent, normalizeWindowEvent } from '../common/events/WindowEvent'
+
 import { windowLocationEventType, isWindowLocationEvent, normalizeWindowLocationEvent } from '../common/events/WindowLocationEvent'
 import { textInputEventType, isTextInputEvent, normalizeTextInputEvent } from '../common/events/TextInputEvent'
 
 import { Event, isEvent } from '../common/events/Event'
+import { WindowMetadata } from './window/WindowMetadata'
 
 export class BackgroundHub {
 
-    private readonly eventHandler: (e: Event) => void
+    private readonly eventHandler: (e: Event, w: WindowMetadata) => void
 
     private readonly verifierMap: Map<string, (e: Event) => boolean>
     private readonly normalizerMap: Map<string, (e: Event) => Event>
 
-    constructor(eventHandler: (e: Event) => void) {
+    constructor(eventHandler: (e: Event, w: WindowMetadata) => void) {
         browser.runtime.onConnect.addListener((p) => this.wirePort(p))
 
         this.eventHandler = eventHandler
@@ -46,24 +48,28 @@ export class BackgroundHub {
         nMap.set(windowEventType, (e: any) => normalizeWindowEvent(e))
         nMap.set(windowLocationEventType, (e: any) => normalizeWindowLocationEvent(e))
         nMap.set(textInputEventType, (e: any) => normalizeTextInputEvent(e))
+
         this.normalizerMap = nMap
     }
 
     private wirePort(port: browser.runtime.Port): void {
+        // onConnect gives us some important metadata about the frame/window the connect came from
+        const windowMetadata = new WindowMetadata(port.sender?.tab?.id, port.sender?.frameId)
+
         if (port.name === "EventPort") {
-            port.onMessage.addListener((event) => this.verifyAndHandle(event))
+            port.onMessage.addListener((event) => this.verifyAndHandle(event, windowMetadata))
         } else {
             console.warn(`Wiring requested for unknown port type`)
         }
     }
 
-    private verifyAndHandle(event: any): void {
+    private verifyAndHandle(event: any, windowMetadata: WindowMetadata): void {
         if (isEvent(event)) {
             const verifier = this.verifierMap.get(event.type)
             const normalizer = this.normalizerMap.get(event.type)
             if (verifier && normalizer) {
                 if (verifier(event)) {
-                    this.eventHandler(normalizer(event))
+                    this.eventHandler(normalizer(event), windowMetadata)
                 } else {
                     console.warn(`Invalid event of type ${event.type} sent from content script`)
                 }
@@ -71,6 +77,5 @@ export class BackgroundHub {
                 console.warn(`Unknown event type ${event.type} sent from content script`)
             }
         }
-
     }
 }

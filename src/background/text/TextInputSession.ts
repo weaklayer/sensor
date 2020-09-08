@@ -64,7 +64,9 @@ export class TextInputSession {
                         interestingInputs.push(thisEntry)
                     }
                 } else {
-                    console.warn("Received TextInput events from content script without text field")
+                    // Keep this entry. Don't want to discard because the one before or after was missing
+                    console.warn("Received TextInput event from content script without text field")
+                    interestingInputs.push(thisEntry)
                 }
 
             }

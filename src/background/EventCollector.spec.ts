@@ -40,7 +40,7 @@ suite('EventCollector', () => {
         }, Number.MAX_SAFE_INTEGER, 1)
 
         const event: Event = { type: "Window", time: 1234 }
-        eventCollector.comsumeEvent(event, fakeDom.window)
+        eventCollector.consumeEvents([event], fakeDom.window)
 
         await semaphore.getSignal()
 
@@ -60,7 +60,7 @@ suite('EventCollector', () => {
         }, 1, Number.MAX_SAFE_INTEGER)
 
         const event: Event = { type: "Window", time: 1234 }
-        eventCollector.comsumeEvent(event, fakeDom.window)
+        eventCollector.consumeEvents([event], fakeDom.window)
 
         await semaphore.getSignal()
 

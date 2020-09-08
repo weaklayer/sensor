@@ -26,6 +26,8 @@ import { TextInputSessionManager } from './text/TextInputSessionManager'
 import { TextInputEventFinalizer } from './text/TextInputEventFinalizer'
 import { TextInputEvent, isTextInputEvent } from '../common/events/TextInputEvent'
 import { EventCollector } from './EventCollector'
+import { WindowTracker } from './window/WindowTracker'
+import { isWindowEvent } from '../common/events/WindowEvent'
 
 console.info(`
 Weaklayer Sensor is available under the terms of the GNU Affero General Public License (GNU AGPL).
@@ -47,17 +49,20 @@ const textHasher: KeyedHasher = new KeyedHasher(() => textHashKeyManager.getHash
 const textInputEventFinalizer = new TextInputEventFinalizer(textHasher)
 const textInputSessionManager: TextInputSessionManager = new TextInputSessionManager(5000, 300000, async (events: Array<TextInputEvent>) => {
     const processedEvents = await textInputEventFinalizer.processTextInputEvents(events)
-    processedEvents.forEach(e => {
-        eventCollector.comsumeEvent(e)
-    })
+    eventCollector.consumeEvents(processedEvents)
 })
 
+const windowTracker = new WindowTracker(async events => {
+    eventCollector.consumeEvents(events)
+})
 
-const eventHub = new BackgroundHub((e) => {
-    if (isTextInputEvent(e)) {
-        textInputSessionManager.trackTextInput(e)
+const eventHub = new BackgroundHub((event, windowMetadata) => {
+    if (isWindowEvent(event)) {
+        windowTracker.trackWindow(event, windowMetadata)
+    } else if (isTextInputEvent(event)) {
+        textInputSessionManager.trackTextInput(event)
     } else {
-        eventCollector.comsumeEvent(e)
+        eventCollector.consumeEvents([event])
     }
 })
 

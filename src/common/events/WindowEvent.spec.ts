@@ -29,6 +29,8 @@ suite('WindowEvent', () => {
         const event2 = {
             type: "Window",
             time: 1324125,
+            isTopLevelWindow: false,
+            topLevelWindowReference: 0,
             extra: "heeyyyyyyyyyy"
         }
 
@@ -62,6 +64,8 @@ suite('WindowEvent', () => {
         const event = {
             type: "Window",
             time: 1324125,
+            isTopLevelWindow: false,
+            topLevelWindowReference: 0,
             extra: "heeyyyyyyyyyy"
         }
 

@@ -27,13 +27,7 @@ export class DocumentCrawler {
 
     crawl(): void {
 
-        // This sets up the initial node processors
-        // TODO:  it is kind of vulnerable to attack though if a malicious
-        //        webpage supplies a DOM to cause a stack overflow
-        this.crawlRecurse(document)
-
         // This listens for DOM changes and sets up more node processors as needed
-        // TODO: Figure out if we need a full recurse or not
         const mutationObserver = new MutationObserver(mutations => {
             mutations.forEach(mutation => {
                 this.addProcessors(mutation.target)
@@ -44,10 +38,14 @@ export class DocumentCrawler {
             attributes: true,
             characterData: true,
             childList: true,
-            subtree: true,
-            attributeOldValue: true,
-            characterDataOldValue: true
+            subtree: true
         })
+
+        // This sets up the initial node processors
+        // TODO:  it is kind of vulnerable to attack though if a malicious
+        //        webpage supplies a DOM to cause a stack overflow
+        this.crawlRecurse(document)
+
     }
 
     private crawlRecurse(node: Node): void {
@@ -61,8 +59,8 @@ export class DocumentCrawler {
     }
 
     private addProcessors(node: Node): void {
-        this.nodeProcessors.forEach((processor: ((n: Node) => void)) => {
-            processor(node)
+        this.nodeProcessors.forEach(p => {
+            p(node)
         })
     }
 }

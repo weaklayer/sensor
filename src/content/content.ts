@@ -37,9 +37,21 @@ const textInputElementManager = new TextInputElementManager(
     (event: TextInputEvent) => contentHub.submitEvent(event)
 )
 
-const documentCrawler = new DocumentCrawler([(node: Node) => textInputElementManager.processNode(node)])
+const documentCrawler = new DocumentCrawler([
+    (node: Node) => textInputElementManager.processNode(node)
+])
 
-// DOM needs to finish loading before we crawl it
-window.addEventListener('DOMContentLoaded', (e) => {
+// The DOM needs to finish loading before we crawl it
+// And set up mutation observation
+if (document.readyState === 'loading') {
+    document.addEventListener("DOMContentLoaded", () => {
+        documentCrawler.crawl()
+    })
+} else {
+    // This if structure is used so we still crawl
+    // if the DOMContentLoaded event is missed
+    // e.g. reinstalling the extension redeploys it into all tabs
+    // but those tabs have already finished loading
+    // this happens a lot in development
     documentCrawler.crawl()
-})
+}

@@ -39,8 +39,9 @@ export class EventCollector {
         this.immediateTimeout = immediateTimeout
     }
 
-    comsumeEvent(event: Event, w: WindowOrWorkerGlobalScope = window): void {
-        this.events.push(event)
+    consumeEvents(events: Array<Event>, w: WindowOrWorkerGlobalScope = window): void {
+
+        this.events.push(...events)
 
         if (!this.overallTimer) {
             // Hold onto events for 5s max before sending them off

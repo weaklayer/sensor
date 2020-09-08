@@ -17,28 +17,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { TextInputEvent } from '../../common/events/TextInputEvent'
-import { KeyedHasher } from "./KeyedHasher"
-import { fromByteArray } from 'base64-js'
+export class WindowMetadata {
 
-export class TextInputEventFinalizer {
+    readonly tabId?: number
+    readonly frameId?: number
 
-    private readonly textHasher: KeyedHasher
-
-    constructor(textHasher: KeyedHasher) {
-        this.textHasher = textHasher
-    }
-
-    async processTextInputEvents(events: Array<TextInputEvent>): Promise<Array<TextInputEvent>> {
-
-        return Promise.all(events.map(async (e) => {
-            // text input events with no text field happen rarely
-            // issue an event with hash of empty string in these cases
-            const hash = await this.textHasher.computeStringHash(e.text || '')
-            e.hash = fromByteArray(hash)
-            e.text = undefined
-
-            return e
-        }))
+    constructor(tabId?: number, frameId?: number) {
+        this.tabId = tabId
+        this.frameId = frameId
     }
 }

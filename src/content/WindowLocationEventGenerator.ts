@@ -40,7 +40,8 @@ export class WindowLocationEventGenerator {
         this.eventConsumer = eventConsumer
         this.pollingInterval = pollingInterval
 
-        setTimeout(() => this.onTimer(), 1)
+        this.onTimer()
+        setTimeout(() => this.onTimer(), this.pollingInterval)
     }
 
     private onTimer(): void {
