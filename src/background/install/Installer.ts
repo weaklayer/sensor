@@ -35,6 +35,15 @@ export class Installer {
     // And we'll keep expiring tokens at bay
     private installRequired: boolean = true
 
+    private readonly identityChangeActions: () => Promise<void>
+    private shouldRunIdentityChangeActions: boolean = false
+
+    // Takes a function that is run if the sensor's identity
+    // i.e. its sensorId changes.
+    constructor(identityChangeActions: () => Promise<void>) {
+        this.identityChangeActions = identityChangeActions
+    }
+
     async getAuthorizationToken(): Promise<string> {
         const info = await this.getInstallInfo()
         return info.token
@@ -68,7 +77,20 @@ export class Installer {
             }
         }
 
-        return this.lock.syncExecute(() => this.getInstallInfoUnsafe())
+        const installInfo = await this.lock.syncExecute(() => this.getInstallInfoUnsafe())
+
+        // The above call will set this flag
+        // Do it this way so we can run the actions outside
+        // of the locked execute
+        // Mainly due to the concern of the identity change actions
+        // calling this class and causing deadlock
+        if (this.shouldRunIdentityChangeActions) {
+            this.shouldRunIdentityChangeActions = false
+            console.info('Running identity change actions.')
+            await this.identityChangeActions()
+        }
+
+        return installInfo
     }
 
     private async getInstallInfoUnsafe(): Promise<InstallResponse> {
@@ -99,8 +121,17 @@ export class Installer {
         //   - write the new repsonse to storage
         //   - copy new response into memory
         console.info('Executing sensor install.')
-        const newInstallInfo = await Installer.renewAuthorizationTokenUnsafe(this.installInfo)
+        const oldInstallInfo = this.installInfo
+        const newInstallInfo = await Installer.renewAuthorizationTokenUnsafe(oldInstallInfo)
         this.installRequired = false
+
+        let identityChange = true
+        if (oldInstallInfo) {
+            if (oldInstallInfo.sensor === newInstallInfo.sensor) {
+                identityChange = false
+            }
+        }
+        this.shouldRunIdentityChangeActions = identityChange
 
         await LocalStorage.setInstallInfo(newInstallInfo)
         this.installInfo = newInstallInfo

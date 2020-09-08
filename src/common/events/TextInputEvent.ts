@@ -37,7 +37,7 @@ export function isTextInputEvent(data: any): data is TextInputEvent {
     const validText: boolean = !textPresent || (textPresent && typeof data.text === 'string')
 
     const hashPresent: boolean = 'hash' in data && typeof data.hash !== 'undefined'
-    var validHash: boolean = !hashPresent || (hashPresent && typeof data.hash === 'string' && hashRegex.test(data.hash))
+    const validHash: boolean = !hashPresent || (hashPresent && typeof data.hash === 'string' && hashRegex.test(data.hash))
 
     const validInputElementType: boolean = 'inputElementType' in data && typeof data.inputElementType === 'string'
     const validWindowLocationReference: boolean = 'windowLocationReference' in data && typeof data.windowLocationReference === 'number' && isEventTime(data.windowLocationReference)

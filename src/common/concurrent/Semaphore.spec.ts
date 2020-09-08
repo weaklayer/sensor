@@ -25,7 +25,7 @@ suite('Semaphore', () => {
 
     test('Waiting on semaphore signal', async () => {
         const s = new Semaphore()
-        var flag = false
+        let flag = false
 
         // set the semphore later in a seperate line of execution
         setTimeout(() => {

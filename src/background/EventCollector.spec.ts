@@ -32,7 +32,7 @@ suite('EventCollector', () => {
         const fakeDom = new JSDOM()
         const semaphore = new Semaphore()
 
-        var capturedEvent: Event | undefined = undefined
+        let capturedEvent: Event | undefined = undefined
 
         const eventCollector = new EventCollector(async (events) => {
             capturedEvent = events[0]
@@ -52,7 +52,7 @@ suite('EventCollector', () => {
         const fakeDom = new JSDOM()
         const semaphore = new Semaphore()
 
-        var capturedEvent: Event | undefined = undefined
+        let capturedEvent: Event | undefined = undefined
 
         const eventCollector = new EventCollector(async (events) => {
             capturedEvent = events[0]

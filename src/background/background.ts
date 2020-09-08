@@ -28,6 +28,7 @@ import { TextInputEvent, isTextInputEvent } from '../common/events/TextInputEven
 import { EventCollector } from './EventCollector'
 import { WindowTracker } from './window/WindowTracker'
 import { isWindowEvent } from '../common/events/WindowEvent'
+import { LocalStorage } from './storage/LocalStorage'
 
 console.info(`
 Weaklayer Sensor is available under the terms of the GNU Affero General Public License (GNU AGPL).
@@ -40,7 +41,7 @@ The Weaklayer Gateway source is available at https://github.com/weaklayer/gatewa
 For more information, please see https://weaklayer.com
 `)
 
-const installer = new Installer()
+const installer = new Installer(() => LocalStorage.clearTextHashKey())
 const sensorEventApi = new SensorEventAPI(installer)
 const eventCollector = new EventCollector((es) => sensorEventApi.submit(es))
 
