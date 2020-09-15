@@ -19,8 +19,9 @@
 
 import { assert } from "../../common/utils/Assert"
 
-import { setStorageValue, getStorageValue, clearStorageValue } from './Storage'
+import { setStorageValue, getStorageValue, clearStorageValue, getStorageString } from './Storage'
 import { InstallResponse, isInstallResponse, normalizeInstallResponse } from "../install/InstallResponse"
+import { fromByteArray, toByteArray } from "base64-js"
 
 export class LocalStorage {
 
@@ -40,13 +41,12 @@ export class LocalStorage {
     }
 
     static async getTextHashKey(): Promise<Uint8Array> {
-        const storageValue = await getStorageValue(LocalStorage.textHashKeyKey, k => browser.storage.local.get(k))
-        assert(storageValue instanceof Uint8Array && storageValue.length === 64, `Value set for ${LocalStorage.textHashKeyKey} in local storage does not conform to the expected schema.`)
-        return storageValue
+        const storageValue: string = await getStorageString(LocalStorage.textHashKeyKey, /^[A-Za-z0-9+/]{86}==$/, k => browser.storage.local.get(k))
+        return toByteArray(storageValue)
     }
 
     static async setTextHashKey(textHashKey: Uint8Array): Promise<void> {
-        return setStorageValue(LocalStorage.textHashKeyKey, textHashKey, (i) => browser.storage.local.set(i))
+        return setStorageValue(LocalStorage.textHashKeyKey, fromByteArray(textHashKey), (i) => browser.storage.local.set(i))
     }
 
     static async clearTextHashKey(): Promise<void> {

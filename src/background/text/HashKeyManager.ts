@@ -22,8 +22,25 @@ import { Lock } from '../../common/concurrent/Lock'
 
 export class HashKeyManager {
 
+    private static readonly keyLength: number = 64
+
+    private readonly keyStorageSupplier: () => Promise<Uint8Array>
+    private readonly keyStorageConsumer: (key: Uint8Array) => Promise<void>
+    private readonly keyStorageClearer: () => Promise<void>
+    private readonly keyGenerator: () => Uint8Array
+
     private readonly lock: Lock = new Lock()
     private cachedValue?: Uint8Array = undefined
+
+    constructor(keyStorageSupplier: () => Promise<Uint8Array> = () => LocalStorage.getTextHashKey(),
+        keyStorageConsumer: (key: Uint8Array) => Promise<void> = (key) => LocalStorage.setTextHashKey(key),
+        keyStorageClearer: () => Promise<void> = () => LocalStorage.clearTextHashKey(),
+        keyGenerator: () => Uint8Array = () => crypto.getRandomValues(new Uint8Array(HashKeyManager.keyLength))) {
+        this.keyStorageSupplier = keyStorageSupplier
+        this.keyStorageConsumer = keyStorageConsumer
+        this.keyStorageClearer = keyStorageClearer
+        this.keyGenerator = keyGenerator
+    }
 
     getHashKey(): Promise<Uint8Array> {
 
@@ -43,17 +60,18 @@ export class HashKeyManager {
         }
 
         try {
-            const storedKey: Uint8Array = await LocalStorage.getTextHashKey()
+            const storedKey: Uint8Array = await this.keyStorageSupplier()
+            this.cachedValue = storedKey
             return storedKey
         } catch (e) {
             console.info('Could not retrieve hash key from local storage. Generating new hash key.', e)
         }
 
-        const newKey: Uint8Array = this.generateNewHashKey()
+        const newKey: Uint8Array = this.keyGenerator()
 
         // important that we are able to persist the hash key
         // before we keep it in this class or return it
-        await LocalStorage.setTextHashKey(newKey)
+        await this.keyStorageConsumer(newKey)
 
         this.cachedValue = newKey
 
@@ -62,13 +80,8 @@ export class HashKeyManager {
 
     clearHashKey(): Promise<void> {
         return this.lock.syncExecute(async () => {
-            await LocalStorage.clearTextHashKey()
+            await this.keyStorageClearer()
             this.cachedValue = undefined
         })
-    }
-
-    // generates random 512 bit hash key
-    private generateNewHashKey(): Uint8Array {
-        return crypto.getRandomValues(new Uint8Array(64))
     }
 }

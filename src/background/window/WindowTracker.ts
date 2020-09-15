@@ -22,26 +22,23 @@ import { WindowMetadata } from "./WindowMetadata"
 
 export class WindowTracker {
 
-    private readonly windowConsumer: (windows: Array<WindowEvent>) => Promise<void>
-
     private readonly topLevelWindowMap: Map<number, number>
 
-    constructor(windowConsumer: (windows: Array<WindowEvent>) => Promise<void>) {
-        this.windowConsumer = windowConsumer
+    constructor() {
         this.topLevelWindowMap = new Map<number, number>()
     }
 
-    trackWindow(event: WindowEvent, windowMetadata: WindowMetadata): void {
+    mutateWindow(event: WindowEvent, windowMetadata: WindowMetadata): void {
         if ('frameId' in windowMetadata && windowMetadata.frameId === 0) {
-            this.trackTopLevelWindow(event, windowMetadata)
+            this.mutateTopLevelWindow(event, windowMetadata)
         } else {
             // note that the frame id is only used for determining if something is a top level window
             // we can still track if tabId and url are set 
-            this.trackLowerLevelWindow(event, windowMetadata)
+            this.mutateLowerLevelWindow(event, windowMetadata)
         }
     }
 
-    private trackTopLevelWindow(event: WindowEvent, windowMetadata: WindowMetadata): void {
+    private mutateTopLevelWindow(event: WindowEvent, windowMetadata: WindowMetadata): void {
         event.isTopLevelWindow = true
         event.topLevelWindowReference = event.time
         if (windowMetadata.tabId) {
@@ -54,11 +51,9 @@ export class WindowTracker {
             // log a warning and send the event off
             console.warn('New top-level window created but no tabId given')
         }
-
-        this.windowConsumer([event])
     }
 
-    private async trackLowerLevelWindow(event: WindowEvent, windowMetadata: WindowMetadata): Promise<void> {
+    private async mutateLowerLevelWindow(event: WindowEvent, windowMetadata: WindowMetadata): Promise<void> {
         event.isTopLevelWindow = false
         event.topLevelWindowReference = 0
         if (windowMetadata.tabId) {
@@ -72,7 +67,5 @@ export class WindowTracker {
             // tabId is missing so we can't effectively track match it against a top level window
             console.warn('New window created but no tabId given')
         }
-
-        this.windowConsumer([event])
     }
 }

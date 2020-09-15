@@ -47,19 +47,18 @@ const eventCollector = new EventCollector((es) => sensorEventApi.submit(es))
 
 const textHashKeyManager = new HashKeyManager()
 const textHasher: KeyedHasher = new KeyedHasher(() => textHashKeyManager.getHashKey())
-const textInputEventFinalizer = new TextInputEventFinalizer(textHasher)
+const textInputEventFinalizer = new TextInputEventFinalizer(text => textHasher.computeStringHash(text))
 const textInputSessionManager: TextInputSessionManager = new TextInputSessionManager(5000, 300000, async (events: Array<TextInputEvent>) => {
     const processedEvents = await textInputEventFinalizer.processTextInputEvents(events)
     eventCollector.consumeEvents(processedEvents)
 })
 
-const windowTracker = new WindowTracker(async events => {
-    eventCollector.consumeEvents(events)
-})
+const windowTracker = new WindowTracker()
 
 const eventHub = new BackgroundHub((event, windowMetadata) => {
     if (isWindowEvent(event)) {
-        windowTracker.trackWindow(event, windowMetadata)
+        windowTracker.mutateWindow(event, windowMetadata)
+        eventCollector.consumeEvents([event])
     } else if (isTextInputEvent(event)) {
         textInputSessionManager.trackTextInput(event)
     } else {

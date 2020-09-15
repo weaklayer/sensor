@@ -34,13 +34,43 @@ export function isEventTime(num: number): boolean {
     return Number.isInteger(num) && num >= 0
 }
 
+
+
+let lastMillisAsMicros: number = 0
+let tag: number = 0
 export function getEventTime(): number {
-    // fill in the micros with noise since Date.now() only gives millis
-    return Date.now() * 1000 + generateTag()
+    const millisAsMicros = getMillisecondTimeAsMicroseconds()
+    if (millisAsMicros !== lastMillisAsMicros) {
+        // reset the tag value whenever the measured time changes
+        // random up to 900 so we don't end up near 1000 and roll over in the same millisecond
+        lastMillisAsMicros = millisAsMicros
+        tag = getRandomInt(0, 900)
+    }
+
+    return millisAsMicros + getTag()
 }
 
-function generateTag(): number {
-    return getRandomInt(0, 999) // [0, 999]
+function getMillisecondTimeAsMicroseconds(): number {
+    // prefer to use the performance time api as it has better guarantees
+    // monotonically increasing time.
+    // Still can't rely on it for microsecond precision though according to docs
+    let millisAsMicros = 0
+    if (typeof performance !== 'undefined' && typeof performance.timeOrigin !== 'undefined') {
+        millisAsMicros = Math.round(performance.timeOrigin + performance.now())
+    } else {
+        millisAsMicros = Date.now()
+    }
+    return millisAsMicros * 1000
+}
+
+// This makes it more likely that two calls in the same millisecond
+// are still monotonically increasing
+function getTag(): number {
+    tag = tag + 1
+    if (tag >= 1000) {
+        tag = 0
+    }
+    return tag
 }
 
 function getRandomInt(min: number, max: number) {

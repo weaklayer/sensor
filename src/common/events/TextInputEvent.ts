@@ -24,7 +24,7 @@ const hashRegex: RegExp = /^[A-Za-z0-9+/]{43}=$/
 
 export interface TextInputEvent extends Event {
     text?: string // this can be undefined because we want to remove it from the event after a hash is calculated
-    hash?: string // this can be undefined because it will start as undefined and be calculated later
+    hash?: string // this can be undefined because it will start as undefined and is later calculated by the background script
     inputElementType: string
     inputElementReference: number
     windowLocationReference: number

@@ -18,14 +18,13 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { TextInputEvent } from '../../common/events/TextInputEvent'
-import { KeyedHasher } from "./KeyedHasher"
 import { fromByteArray } from 'base64-js'
 
 export class TextInputEventFinalizer {
 
-    private readonly textHasher: KeyedHasher
+    private readonly textHasher: (text: string) => Promise<Uint8Array>
 
-    constructor(textHasher: KeyedHasher) {
+    constructor(textHasher: (text: string) => Promise<Uint8Array>) {
         this.textHasher = textHasher
     }
 
@@ -34,7 +33,7 @@ export class TextInputEventFinalizer {
         return Promise.all(events.map(async (e) => {
             // text input events with no text field happen rarely
             // issue an event with hash of empty string in these cases
-            const hash = await this.textHasher.computeStringHash(e.text || '')
+            const hash = await this.textHasher(e.text || '')
             e.hash = fromByteArray(hash)
             e.text = undefined
 
