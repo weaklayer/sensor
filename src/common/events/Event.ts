@@ -36,31 +36,29 @@ export function isEventTime(num: number): boolean {
 
 
 
-let lastMillisAsMicros: number = 0
+let lastMillis: number = 0
 let tag: number = 0
 export function getEventTime(): number {
-    const millisAsMicros = getMillisecondTimeAsMicroseconds()
-    if (millisAsMicros !== lastMillisAsMicros) {
+    const millis = getEpochMillis()
+    if (millis !== lastMillis) {
         // reset the tag value whenever the measured time changes
         // random up to 900 so we don't end up near 1000 and roll over in the same millisecond
-        lastMillisAsMicros = millisAsMicros
+        lastMillis = millis
         tag = getRandomInt(0, 900)
     }
 
-    return millisAsMicros + getTag()
+    return millis * 1000 + getTag()
 }
 
-function getMillisecondTimeAsMicroseconds(): number {
+function getEpochMillis(): number {
     // prefer to use the performance time api as it has better guarantees
     // monotonically increasing time.
     // Still can't rely on it for microsecond precision though according to docs
-    let millisAsMicros = 0
     if (typeof performance !== 'undefined' && typeof performance.timeOrigin !== 'undefined') {
-        millisAsMicros = Math.round(performance.timeOrigin + performance.now())
+        return Math.round(performance.timeOrigin + performance.now())
     } else {
-        millisAsMicros = Date.now()
+        return Date.now()
     }
-    return millisAsMicros * 1000
 }
 
 // This makes it more likely that two calls in the same millisecond
