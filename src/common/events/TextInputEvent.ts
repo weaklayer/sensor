@@ -24,9 +24,10 @@ const hashRegex: RegExp = /^[A-Za-z0-9+/]{43}=$/
 
 export interface TextInputEvent extends Event {
     text?: string // this can be undefined because we want to remove it from the event after a hash is calculated
-    hash?: string // this can be undefined because it will start as undefined and is later calculated by the background script
-    inputElementType: string
-    inputElementReference: number
+    textHash?: string // this can be undefined because it will start as undefined and is later calculated by the background script
+    textLength: number
+    textType: string
+    elementReference: number
     windowLocationReference: number
 }
 
@@ -36,17 +37,19 @@ export function isTextInputEvent(data: any): data is TextInputEvent {
     const textPresent: boolean = 'text' in data && typeof data.text !== 'undefined'
     const validText: boolean = !textPresent || (textPresent && typeof data.text === 'string')
 
-    const hashPresent: boolean = 'hash' in data && typeof data.hash !== 'undefined'
-    const validHash: boolean = !hashPresent || (hashPresent && typeof data.hash === 'string' && hashRegex.test(data.hash))
+    const hashPresent: boolean = 'textHash' in data && typeof data.textHash !== 'undefined'
+    const validHash: boolean = !hashPresent || (hashPresent && typeof data.textHash === 'string' && hashRegex.test(data.textHash))
 
-    const validInputElementType: boolean = 'inputElementType' in data && typeof data.inputElementType === 'string'
+    const validTextLength: boolean = 'textLength' in data && typeof data.textLength === 'number' && data.textLength >= 0
+
+    const validTextType: boolean = 'textType' in data && typeof data.textType === 'string'
     const validWindowLocationReference: boolean = 'windowLocationReference' in data && typeof data.windowLocationReference === 'number' && isEventTime(data.windowLocationReference)
 
-    const validInputElementReference = 'inputElementReference' in data && typeof data.inputElementReference === 'number' && isEventTime(data.inputElementReference)
+    const validElementReference = 'elementReference' in data && typeof data.elementReference === 'number' && isEventTime(data.elementReference)
 
     const textXorHashPresent: boolean = ((textPresent || !hashPresent) || (!textPresent || hashPresent))
 
-    return validEvent && validText && validHash && textXorHashPresent && validInputElementType && validWindowLocationReference && validInputElementReference
+    return validEvent && validText && validHash && textXorHashPresent && validTextLength && validTextType && validWindowLocationReference && validElementReference
 }
 
 export function normalizeTextInputEvent(event: TextInputEvent): TextInputEvent {
@@ -54,21 +57,23 @@ export function normalizeTextInputEvent(event: TextInputEvent): TextInputEvent {
         type: textInputEventType,
         time: event.time,
         text: event.text,
-        hash: event.hash,
-        inputElementType: event.inputElementType,
+        textHash: event.textHash,
+        textLength: event.textLength,
+        textType: event.textType,
         windowLocationReference: event.windowLocationReference,
-        inputElementReference: event.inputElementReference
+        elementReference: event.elementReference
     }
 }
 
-export function createTextInputEvent(text: string, inputElementType: string, windowLocationReference: number, inputElementReference: number): TextInputEvent {
+export function createTextInputEvent(text: string, textType: string, windowLocationReference: number, elementReference: number): TextInputEvent {
 
     return {
         type: textInputEventType,
         time: getEventTime(),
         text: text,
-        inputElementType: inputElementType,
+        textLength: text?.length || 0, // Events with missing text still seem to make it to the background script event though they are created with this
+        textType: textType,
         windowLocationReference: windowLocationReference,
-        inputElementReference: inputElementReference
+        elementReference: elementReference
     }
 }

@@ -32,7 +32,7 @@ suite('TextInputEventFinalizer', () => {
 
         const finalizedEvents = await finalizer.processTextInputEvents([event])
 
-        assert(finalizedEvents[0].hash === fromByteArray(hash), 'Finalized text input event hash incorrect')
+        assert(finalizedEvents[0].textHash === fromByteArray(hash), 'Finalized text input event hash incorrect')
         assert(finalizedEvents[0].text === undefined, 'Finalized text input event contains text field')
     })
 })

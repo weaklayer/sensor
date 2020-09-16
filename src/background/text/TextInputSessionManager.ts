@@ -38,11 +38,11 @@ export class TextInputSessionManager {
     }
 
     trackTextInput(event: TextInputEvent): void {
-        if (!(event.inputElementReference)) {
+        if (!(event.elementReference)) {
             console.warn("Received TextInput event from content script without inputElementReference field")
             return
         }
-        const sessionId: number = event.inputElementReference
+        const sessionId: number = event.elementReference
 
         let session: TextInputSession | undefined = this.sessions.get(sessionId)
         if (!session) {

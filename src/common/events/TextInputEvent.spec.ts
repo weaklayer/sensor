@@ -31,9 +31,10 @@ suite('TextInputEvent', () => {
             type: textInputEventType,
             time: 3,
             text: undefined,
-            hash: 'jvqWXRmh9JAnbwDS19W59lOJXD2dZuRglhFtsJzDedU=',
-            inputElementType: 'password',
-            inputElementReference: 3,
+            textLength: 0,
+            textHash: 'jvqWXRmh9JAnbwDS19W59lOJXD2dZuRglhFtsJzDedU=',
+            textType: 'password',
+            elementReference: 3,
             windowLocationReference: 6
         }
         assert.isTrue(isTextInputEvent(event2), "Valid event identified as invalid")
@@ -44,9 +45,10 @@ suite('TextInputEvent', () => {
             type: textInputEventType,
             time: 3,
             text: undefined,
-            hash: 'jvqWXRmh9JAnbwDS19W59lOJXD2dZuRglhFtsJzDedU=',
-            inputElementType: 'password',
-            inputElementReference: 3,
+            textLength: 0,
+            textHash: 'jvqWXRmh9JAnbwDS19W59lOJXD2dZuRglhFtsJzDedU=',
+            textType: 'password',
+            elementReference: 3,
             windowLocationReference: 6,
             extra: "gsdfgfdshgsdfhsgfhdf"
         }

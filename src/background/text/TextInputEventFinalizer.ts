@@ -34,7 +34,8 @@ export class TextInputEventFinalizer {
             // text input events with no text field happen rarely
             // issue an event with hash of empty string in these cases
             const hash = await this.textHasher(e.text || '')
-            e.hash = fromByteArray(hash)
+            e.textLength = e.text?.length || 0
+            e.textHash = fromByteArray(hash)
             e.text = undefined
 
             return e
