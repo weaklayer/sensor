@@ -17,48 +17,46 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { TextInputEvent, createTextInputEvent, isTextInputEvent, normalizeTextInputEvent, textInputEventType } from './TextInputEvent'
+import { TextCaptureEvent, createTextCaptureEvent, isTextCaptureEvent, normalizeTextCaptureEvent, textCaptureEventType } from './TextCaptureEvent'
 import { assert } from 'chai'
 import { test, suite } from 'mocha'
 
-suite('TextInputEvent', () => {
+suite('TextCaptureEvent', () => {
 
-    test('TextInputEvent verification', () => {
-        const event1: TextInputEvent = createTextInputEvent('hello', 'password', 2, 5)
-        assert.isTrue(isTextInputEvent(event1), "Valid event identified as invalid")
+    test('TextCaptureEvent verification', () => {
+        const event1: TextCaptureEvent = createTextCaptureEvent('hello', 'password', 22, 2, 5)
+        assert.isTrue(isTextCaptureEvent(event1), "Valid event identified as invalid")
 
-        const event2: TextInputEvent = {
-            type: textInputEventType,
+        const event2: TextCaptureEvent = {
+            type: textCaptureEventType,
             time: 3,
-            text: undefined,
-            textLength: 0,
-            textHash: 'jvqWXRmh9JAnbwDS19W59lOJXD2dZuRglhFtsJzDedU=',
+            text: 'hello',
             textType: 'password',
+            windowReference: 100,
             elementReference: 3,
             windowLocationReference: 6
         }
-        assert.isTrue(isTextInputEvent(event2), "Valid event identified as invalid")
+        assert.isTrue(isTextCaptureEvent(event2), "Valid event identified as invalid")
     })
 
-    test('TextInputEvent normalization', () => {
+    test('TextCaptureEvent normalization', () => {
         const event: any = {
-            type: textInputEventType,
+            type: textCaptureEventType,
             time: 3,
-            text: undefined,
-            textLength: 0,
-            textHash: 'jvqWXRmh9JAnbwDS19W59lOJXD2dZuRglhFtsJzDedU=',
+            text: '',
             textType: 'password',
+            windowReference: 100,
             elementReference: 3,
             windowLocationReference: 6,
             extra: "gsdfgfdshgsdfhsgfhdf"
         }
 
-        assert.isTrue(isTextInputEvent(event))
+        assert.isTrue(isTextCaptureEvent(event))
         assert.isTrue('extra' in event, "Test base event missing extra field")
 
-        const normalizedEvent = normalizeTextInputEvent(event)
+        const normalizedEvent = normalizeTextCaptureEvent(event)
 
-        assert.isTrue(isTextInputEvent(normalizedEvent), "Valid event identified as invalid")
+        assert.isTrue(isTextCaptureEvent(normalizedEvent), "Valid event identified as invalid")
         assert.isFalse('extra' in normalizedEvent, "Extra field present in normalized event")
 
     })

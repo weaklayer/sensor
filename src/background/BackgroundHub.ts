@@ -20,7 +20,7 @@
 import { windowEventType, isWindowEvent, normalizeWindowEvent } from '../common/events/WindowEvent'
 
 import { windowLocationEventType, isWindowLocationEvent, normalizeWindowLocationEvent } from '../common/events/WindowLocationEvent'
-import { textInputEventType, isTextInputEvent, normalizeTextInputEvent } from '../common/events/TextInputEvent'
+import { textCaptureEventType, isTextCaptureEvent, normalizeTextCaptureEvent } from '../common/events/internal/TextCaptureEvent'
 
 import { Event, isEvent } from '../common/events/Event'
 import { WindowMetadata } from './window/WindowMetadata'
@@ -40,14 +40,14 @@ export class BackgroundHub {
         const vMap = new Map<string, (e: Event) => boolean>()
         vMap.set(windowEventType, (e: any) => isWindowEvent(e))
         vMap.set(windowLocationEventType, (e: any) => isWindowLocationEvent(e))
-        vMap.set(textInputEventType, (e: any) => isTextInputEvent(e))
+        vMap.set(textCaptureEventType, (e: any) => isTextCaptureEvent(e))
         this.verifierMap = vMap
 
         const nMap = new Map<string, (e: Event) => Event>()
         nMap.set
         nMap.set(windowEventType, (e: any) => normalizeWindowEvent(e))
         nMap.set(windowLocationEventType, (e: any) => normalizeWindowLocationEvent(e))
-        nMap.set(textInputEventType, (e: any) => normalizeTextInputEvent(e))
+        nMap.set(textCaptureEventType, (e: any) => normalizeTextCaptureEvent(e))
 
         this.normalizerMap = nMap
     }

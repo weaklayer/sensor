@@ -22,13 +22,13 @@ import { SensorEventAPI } from './SensorEventAPI'
 import { BackgroundHub } from './BackgroundHub'
 import { HashKeyManager } from './text/HashKeyManager'
 import { KeyedHasher } from './text/KeyedHasher'
-import { TextInputSessionManager } from './text/TextInputSessionManager'
 import { TextInputEventFinalizer } from './text/TextInputEventFinalizer'
-import { TextInputEvent, isTextInputEvent } from '../common/events/TextInputEvent'
+import { TextCaptureEvent, isTextCaptureEvent } from '../common/events/internal/TextCaptureEvent'
 import { EventCollector } from './EventCollector'
 import { WindowTracker } from './window/WindowTracker'
 import { isWindowEvent } from '../common/events/WindowEvent'
 import { LocalStorage } from './storage/LocalStorage'
+import { TextCaptureSessionManager } from './text/TextCaptureSessionManager'
 
 console.info(`
 Weaklayer Sensor is available under the terms of the GNU Affero General Public License (GNU AGPL).
@@ -48,8 +48,8 @@ const eventCollector = new EventCollector((es) => sensorEventApi.submit(es))
 const textHashKeyManager = new HashKeyManager()
 const textHasher: KeyedHasher = new KeyedHasher(() => textHashKeyManager.getHashKey())
 const textInputEventFinalizer = new TextInputEventFinalizer(text => textHasher.computeStringHash(text))
-const textInputSessionManager: TextInputSessionManager = new TextInputSessionManager(5000, 300000, async (events: Array<TextInputEvent>) => {
-    const processedEvents = await textInputEventFinalizer.processTextInputEvents(events)
+const textInputSessionManager: TextCaptureSessionManager = new TextCaptureSessionManager(5000, 300000, async (events: Array<TextCaptureEvent>) => {
+    const processedEvents = await textInputEventFinalizer.processTextCaptureEvents(events)
     eventCollector.consumeEvents(processedEvents)
 })
 
@@ -59,8 +59,8 @@ const eventHub = new BackgroundHub((event, windowMetadata) => {
     if (isWindowEvent(event)) {
         windowTracker.mutateWindow(event, windowMetadata)
         eventCollector.consumeEvents([event])
-    } else if (isTextInputEvent(event)) {
-        textInputSessionManager.trackTextInput(event)
+    } else if (isTextCaptureEvent(event)) {
+        textInputSessionManager.trackTextCapture(event)
     } else {
         eventCollector.consumeEvents([event])
     }

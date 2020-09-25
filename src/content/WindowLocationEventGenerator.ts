@@ -44,7 +44,15 @@ export class WindowLocationEventGenerator {
         setTimeout(() => this.onTimer(), this.pollingInterval)
     }
 
-    private onTimer(): void {
+    private onTimer() {
+        this.updateLocation()
+
+        if (this.continue) {
+            setTimeout(() => this.onTimer(), this.pollingInterval)
+        }
+    }
+
+    private updateLocation() {
         const currentLocation = this.locationSupplier().href
 
         if (currentLocation !== this.lastLocation) {
@@ -53,13 +61,10 @@ export class WindowLocationEventGenerator {
             this.lastLocationReference = event.time
             this.eventConsumer(event)
         }
-
-        if (this.continue) {
-            setTimeout(() => this.onTimer(), this.pollingInterval)
-        }
     }
 
     getCurrentWindowLocationReference(): number {
+        this.updateLocation()
         return this.lastLocationReference
     }
 

@@ -17,8 +17,9 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { TextInputEvent } from '../../common/events/TextInputEvent'
+import { TextInputEvent, createTextInputEvent } from '../../common/events/TextInputEvent'
 import { fromByteArray } from 'base64-js'
+import { TextCaptureEvent } from '../../common/events/internal/TextCaptureEvent'
 
 export class TextInputEventFinalizer {
 
@@ -28,17 +29,14 @@ export class TextInputEventFinalizer {
         this.textHasher = textHasher
     }
 
-    async processTextInputEvents(events: Array<TextInputEvent>): Promise<Array<TextInputEvent>> {
+    async processTextCaptureEvents(events: Array<TextCaptureEvent>): Promise<Array<TextInputEvent>> {
 
         return Promise.all(events.map(async (e) => {
-            // text input events with no text field happen rarely
-            // issue an event with hash of empty string in these cases
-            const hash = await this.textHasher(e.text || '')
-            e.textLength = e.text?.length || 0
-            e.textHash = fromByteArray(hash)
-            e.text = undefined
+            const hash = await this.textHasher(e.text)
 
-            return e
+            const textInputEvent = createTextInputEvent(e.time, fromByteArray(hash), e.text.length, e.textType, e.windowLocationReference)
+
+            return textInputEvent
         }))
     }
 }

@@ -19,20 +19,19 @@
 
 import { assert } from 'chai'
 import { test, suite } from 'mocha';
-import { TextInputEvent, createTextInputEvent } from '../../common/events/TextInputEvent'
 import { TextInputEventFinalizer } from './TextInputEventFinalizer'
 import { fromByteArray } from 'base64-js'
+import { createTextCaptureEvent } from '../../common/events/internal/TextCaptureEvent';
 
 suite('TextInputEventFinalizer', () => {
     test('Calculates hash and removes text', async () => {
         const hash = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8])
         const finalizer = new TextInputEventFinalizer(async (text) => hash)
 
-        const event: TextInputEvent = createTextInputEvent('hello', 'text', 1, 2)
+        const event = createTextCaptureEvent('hello', 'text', 22, 1, 2)
 
-        const finalizedEvents = await finalizer.processTextInputEvents([event])
+        const finalizedEvents = await finalizer.processTextCaptureEvents([event])
 
         assert(finalizedEvents[0].textHash === fromByteArray(hash), 'Finalized text input event hash incorrect')
-        assert(finalizedEvents[0].text === undefined, 'Finalized text input event contains text field')
     })
 })

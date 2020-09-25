@@ -17,36 +17,32 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { TextInputSession } from "./TextInputSession"
-import { TextInputEvent } from '../../common/events/TextInputEvent'
+import { TextCaptureSession } from "./TextCaptureSession"
+import { TextCaptureEvent } from "../../common/events/internal/TextCaptureEvent"
 
-export class TextInputSessionManager {
+export class TextCaptureSessionManager {
 
     private readonly sessionTimers: Map<number, number> = new Map<number, number>()
     private readonly globalTimers: Map<number, number> = new Map<number, number>()
-    private readonly sessions: Map<number, TextInputSession> = new Map<number, TextInputSession>()
+    private readonly sessions: Map<number, TextCaptureSession> = new Map<number, TextCaptureSession>()
 
     private readonly sessionTimeoutMillis: number
     private readonly maxSessionLengthMillis: number
-    private readonly interestingInputConsumer: (interestingInputs: Array<TextInputEvent>) => Promise<void>
+    private readonly interestingCaptureConsumer: (interestingCaptures: Array<TextCaptureEvent>) => Promise<void>
 
     constructor(sessionTimeoutMillis: number, maxSessionLengthMillis: number,
-        interestingInputConsumer: (interestingInputs: Array<TextInputEvent>) => Promise<void>) {
-        this.interestingInputConsumer = interestingInputConsumer
+        interestingCaptureConsumer: (interestingCaptures: Array<TextCaptureEvent>) => Promise<void>) {
+        this.interestingCaptureConsumer = interestingCaptureConsumer
         this.sessionTimeoutMillis = sessionTimeoutMillis
         this.maxSessionLengthMillis = maxSessionLengthMillis
     }
 
-    trackTextInput(event: TextInputEvent): void {
-        if (!(event.elementReference)) {
-            console.warn("Received TextInput event from content script without inputElementReference field")
-            return
-        }
+    trackTextCapture(event: TextCaptureEvent): void {
         const sessionId: number = event.elementReference
 
-        let session: TextInputSession | undefined = this.sessions.get(sessionId)
+        let session: TextCaptureSession | undefined = this.sessions.get(sessionId)
         if (!session) {
-            session = new TextInputSession()
+            session = new TextCaptureSession()
             this.sessions.set(sessionId, session)
         }
 
@@ -61,7 +57,7 @@ export class TextInputSessionManager {
             this.globalTimers.set(sessionId, window.setTimeout(() => this.processSession(sessionId), this.maxSessionLengthMillis))
         }
 
-        session.trackTextInput(event)
+        session.trackTextCapture(event)
     }
 
     private processSession(sessionId: number): void {
@@ -77,9 +73,9 @@ export class TextInputSessionManager {
             this.globalTimers.delete(sessionId)
         }
 
-        let session: TextInputSession | undefined = this.sessions.get(sessionId)
+        let session: TextCaptureSession | undefined = this.sessions.get(sessionId)
         if (session) {
-            this.interestingInputConsumer(session.getInterestingTextInputs())
+            this.interestingCaptureConsumer(session.getInterestingTextCaptures())
             this.sessions.delete(sessionId)
         }
     }

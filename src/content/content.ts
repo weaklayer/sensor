@@ -20,9 +20,7 @@
 import { ContentHub } from './ContentHub'
 import { WindowEvent, createWindowEvent } from '../common/events/WindowEvent'
 import { WindowLocationEventGenerator } from './WindowLocationEventGenerator'
-import { DocumentCrawler } from './DocumentCrawler'
-import { TextInputElementManager } from './text/TextInputElementManager'
-import { TextInputEvent } from '../common/events/TextInputEvent'
+import { TextInputEventManager } from './text/TextInputEventManager'
 
 // We hold onto this event here as most events in this window will link to it
 const windowEvent: WindowEvent = createWindowEvent()
@@ -32,26 +30,8 @@ contentHub.submitEvent(windowEvent)
 
 const windowLocationEventGenerator = new WindowLocationEventGenerator(windowEvent.time, () => window.location, (e) => contentHub.submitEvent(e))
 
-const textInputElementManager = new TextInputElementManager(
+const textInputEventManager = new TextInputEventManager(
+    windowEvent.time,
     () => windowLocationEventGenerator.getCurrentWindowLocationReference(),
-    (event: TextInputEvent) => contentHub.submitEvent(event)
+    (event) => contentHub.submitEvent(event)
 )
-
-const documentCrawler = new DocumentCrawler([
-    (node: Node) => textInputElementManager.processNode(node)
-])
-
-// The DOM needs to finish loading before we crawl it
-// And set up mutation observation
-if (document.readyState === 'loading') {
-    document.addEventListener("DOMContentLoaded", () => {
-        documentCrawler.crawl()
-    })
-} else {
-    // This if structure is used so we still crawl
-    // if the DOMContentLoaded event is missed
-    // e.g. reinstalling the extension redeploys it into all tabs
-    // but those tabs have already finished loading
-    // this happens a lot in development
-    documentCrawler.crawl()
-}
