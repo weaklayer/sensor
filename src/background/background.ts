@@ -29,6 +29,7 @@ import { WindowTracker } from './window/WindowTracker'
 import { isWindowEvent } from '../common/events/WindowEvent'
 import { LocalStorage } from './storage/LocalStorage'
 import { TextCaptureSessionManager } from './text/TextCaptureSessionManager'
+import { TextInputEventDeduplicator } from './text/TextInputEventDeduplicator'
 
 console.info(`
 Weaklayer Sensor is available under the terms of the GNU Affero General Public License (GNU AGPL).
@@ -48,9 +49,13 @@ const eventCollector = new EventCollector((es) => sensorEventApi.submit(es))
 const textHashKeyManager = new HashKeyManager()
 const textHasher: KeyedHasher = new KeyedHasher(() => textHashKeyManager.getHashKey())
 const textInputEventFinalizer = new TextInputEventFinalizer(text => textHasher.computeStringHash(text))
+const textInputEventDeduplicator = new TextInputEventDeduplicator(event => eventCollector.consumeEvents([event]))
+
 const textInputSessionManager: TextCaptureSessionManager = new TextCaptureSessionManager(5000, 300000, async (events: Array<TextCaptureEvent>) => {
     const processedEvents = await textInputEventFinalizer.processTextCaptureEvents(events)
-    eventCollector.consumeEvents(processedEvents)
+    processedEvents.forEach(async e => {
+        textInputEventDeduplicator.processTextInput(e)
+    })
 })
 
 const windowTracker = new WindowTracker()
