@@ -77,10 +77,10 @@ export class EventCollector {
             console.warn('Failed submitting events to gateway. Will retry soon.', e)
             if (eventsCapture.length > this.maxBufferSize) {
                 // Throw out oldest events to get us down to the max buffer size
-                eventsCapture = eventsCapture.slice((eventsCapture.length - this.maxBufferSize))
+                eventsCapture = eventsCapture.slice(eventsCapture.length - this.maxBufferSize)
             }
-            // by just adding the events here, we don't actually retry the send right away
-            // the next call to consumeEvents will do that
+            // 1) append to this.events (instead on assigning) as it could have been added to already during the above await
+            // 2) append instead of calling consumeEvents so we dont queue up another immediate submission attempt
             this.events.push(...eventsCapture)
         }
     }
