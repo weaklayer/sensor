@@ -27,16 +27,19 @@ export class EventCollector {
 
     private readonly immediateTimeout: number
 
+    private readonly maxBufferSize: number
+
     private events: Array<Event> = new Array<Event>()
 
     private overallTimer: number | undefined = undefined
 
     private immediateTimer: number | undefined = undefined
 
-    constructor(eventsConsumer: (es: Array<Event>) => Promise<void>, overallTimeout: number = 10000, immediateTimeout: number = 1000) {
+    constructor(eventsConsumer: (es: Array<Event>) => Promise<void>, overallTimeout: number = 10000, immediateTimeout: number = 1000, maxBufferSize: number = 10000) {
         this.eventsConsumer = eventsConsumer
         this.overallTimeout = overallTimeout
         this.immediateTimeout = immediateTimeout
+        this.maxBufferSize = maxBufferSize
     }
 
     consumeEvents(events: Array<Event>, w: WindowOrWorkerGlobalScope = window): void {
@@ -66,9 +69,19 @@ export class EventCollector {
             this.immediateTimer = undefined
         }
 
-        const eventsCapture = this.events
+        let eventsCapture = this.events
         this.events = new Array<Event>()
-
-        return this.eventsConsumer(eventsCapture)
+        try {
+            await this.eventsConsumer(eventsCapture)
+        } catch (e) {
+            console.warn('Failed submitting events to gateway. Will retry soon.', e)
+            if (eventsCapture.length > this.maxBufferSize) {
+                // Throw out oldest events to get us down to the max buffer size
+                eventsCapture = eventsCapture.slice((eventsCapture.length - this.maxBufferSize))
+            }
+            // by just adding the events here, we don't actually retry the send right away
+            // the next call to consumeEvents will do that
+            this.events.push(...eventsCapture)
+        }
     }
 }
