@@ -24,7 +24,7 @@ import { fromByteArray } from 'base64-js'
 import { createTextCaptureEvent } from '../../common/events/internal/TextCaptureEvent';
 
 suite('TextInputEventFinalizer', () => {
-    test('Calculates hash and removes text', async () => {
+    test('Calculates hash', async () => {
         const hash = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8])
         const finalizer = new TextInputEventFinalizer(async (text) => hash)
 

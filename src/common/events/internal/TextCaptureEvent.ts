@@ -23,7 +23,7 @@ export const textCaptureEventType = 'TextCapture'
 
 export interface TextCaptureEvent extends Event {
     text: string
-    textType: string
+    inputType: string
     windowReference: number
     windowLocationReference: number
     elementReference: number
@@ -33,14 +33,14 @@ export function isTextCaptureEvent(data: any): data is TextCaptureEvent {
     const validEvent: boolean = isEvent(data) && data.type === textCaptureEventType
 
     const validText: boolean = 'text' in data && typeof data.text === 'string'
-    const validTextType: boolean = 'textType' in data && typeof data.textType === 'string'
+    const validInputType: boolean = 'inputType' in data && typeof data.inputType === 'string'
 
     const validWindowReference: boolean = 'windowReference' in data && typeof data.windowReference === 'number' && isEventTime(data.windowReference)
     const validWindowLocationReference: boolean = 'windowLocationReference' in data && typeof data.windowLocationReference === 'number' && isEventTime(data.windowLocationReference)
     const validElementReference = 'elementReference' in data && typeof data.elementReference === 'number' && isEventTime(data.elementReference)
 
 
-    return validEvent && validText && validTextType && validWindowReference && validWindowLocationReference && validElementReference
+    return validEvent && validText && validInputType && validWindowReference && validWindowLocationReference && validElementReference
 }
 
 export function normalizeTextCaptureEvent(event: TextCaptureEvent): TextCaptureEvent {
@@ -48,21 +48,21 @@ export function normalizeTextCaptureEvent(event: TextCaptureEvent): TextCaptureE
         type: textCaptureEventType,
         time: event.time,
         text: event.text,
-        textType: event.textType,
+        inputType: event.inputType,
         windowReference: event.windowReference,
         windowLocationReference: event.windowLocationReference,
         elementReference: event.elementReference
     }
 }
 
-export function createTextCaptureEvent(text: string | undefined, textType: string, windowReference: number, windowLocationReference: number, elementReference: number): TextCaptureEvent {
+export function createTextCaptureEvent(text: string | undefined, inputType: string, windowReference: number, windowLocationReference: number, elementReference: number): TextCaptureEvent {
     const t = text || ''  // Events with missing text somehow seem to happen on occasion
 
     return {
         type: textCaptureEventType,
         time: getEventTime(),
         text: t,
-        textType: textType,
+        inputType: inputType,
         windowReference: windowReference,
         windowLocationReference: windowLocationReference,
         elementReference: elementReference

@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { getEventTime } from "../common/events/Event"
+
 // Copyright (C) 2020 Mitchell Wasson
 
 // This file is part of Weaklayer Sensor.
@@ -17,24 +19,18 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Event } from './Event'
+export class ElementRegistry {
 
-export const textInputEventType = 'TextInput'
+    private readonly elementReferences: Map<EventTarget, number> = new Map<Node, number>()
 
-export interface TextInputEvent extends Event {
-    textHash: string
-    textLength: number
-    inputType: string
-    windowLocationReference: number
-}
+    getElementReference(element: EventTarget): number {
+        let reference = this.elementReferences.get(element)
+        if (reference) {
+            return reference
+        }
 
-export function createTextInputEvent(time: number, textHash: string, textLength: number, inputType: string, windowLocationReference: number): TextInputEvent {
-    return {
-        type: textInputEventType,
-        time: time,
-        textHash: textHash,
-        textLength: textLength,
-        inputType: inputType,
-        windowLocationReference: windowLocationReference
+        reference = getEventTime()
+        this.elementReferences.set(element, reference)
+        return reference
     }
 }

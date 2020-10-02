@@ -55,9 +55,9 @@ export class TextCaptureSession {
                 const thisText: string = thisEntry.text
                 const nextText: string = nextEntry.text
 
-                if (thisText.length >= lastText.length && nextText.length >= thisText.length) {
+                if (thisText.length > lastText.length && nextText.length > thisText.length) {
                     // monotonic increasing string
-                } else if (lastText.length >= thisText.length && thisText.length >= nextText.length) {
+                } else if (lastText.length > thisText.length && thisText.length > nextText.length) {
                     // monotonic decreasing string
                 } else {
                     interestingCaptures.push(thisEntry)
@@ -70,6 +70,17 @@ export class TextCaptureSession {
             interestingCaptures.push(this.events[this.events.length - 1])
         }
 
-        return interestingCaptures
+        // Deduplicate captures
+        const deduplicatedCaptures: Array<TextCaptureEvent> = new Array<TextCaptureEvent>()
+
+        const seenStrings = new Set<string>()
+        for (let capture of interestingCaptures) {
+            if (!seenStrings.has(capture.text)) {
+                seenStrings.add(capture.text)
+                deduplicatedCaptures.push(capture)
+            }
+        }
+
+        return deduplicatedCaptures
     }
 }

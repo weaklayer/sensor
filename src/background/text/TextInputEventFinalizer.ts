@@ -32,9 +32,12 @@ export class TextInputEventFinalizer {
     async processTextCaptureEvents(events: Array<TextCaptureEvent>): Promise<Array<TextInputEvent>> {
 
         return Promise.all(events.map(async (e) => {
-            const hash = await this.textHasher(e.text)
+            // normalize the text before hashing.
+            // this will avoid equivalent strings not matching because of different unicode representations
+            // see https://flaviocopes.com/javascript-unicode/ for examples
+            const hash = await this.textHasher(e.text.normalize())
 
-            const textInputEvent = createTextInputEvent(e.time, fromByteArray(hash), e.text.length, e.textType, e.windowLocationReference)
+            const textInputEvent = createTextInputEvent(e.time, fromByteArray(hash), e.text.length, e.inputType, e.windowLocationReference)
 
             return textInputEvent
         }))

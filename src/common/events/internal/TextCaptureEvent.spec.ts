@@ -31,7 +31,7 @@ suite('TextCaptureEvent', () => {
             type: textCaptureEventType,
             time: 3,
             text: 'hello',
-            textType: 'password',
+            inputType: 'password',
             windowReference: 100,
             elementReference: 3,
             windowLocationReference: 6
@@ -44,7 +44,7 @@ suite('TextCaptureEvent', () => {
             type: textCaptureEventType,
             time: 3,
             text: '',
-            textType: 'password',
+            inputType: 'password',
             windowReference: 100,
             elementReference: 3,
             windowLocationReference: 6,

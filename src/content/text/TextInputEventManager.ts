@@ -17,93 +17,71 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { HTMLInputEventManager } from "./capture/HTMLInputEventManager"
-import { TextCaptureEvent } from "../../common/events/internal/TextCaptureEvent"
+import { HTMLInputEventManager } from "./HTMLInputEventManager"
+import { TextCaptureEvent, createTextCaptureEvent } from "../../common/events/internal/TextCaptureEvent"
+import { ElementRegistry } from "../ElementRegistry"
+import { TextChunkEventManager } from "./TextChunkEventManager"
+import { VirtualElementManager } from "./composition/VirtualElementManager"
 
 export class TextInputEventManager {
 
     private readonly htmlInputEventManager: HTMLInputEventManager
 
-    constructor(windowReference: number, windowLocationReferenceProducer: () => number, textInputEventConsumer: (e: TextCaptureEvent) => void) {
+    private readonly virtualElementManager: VirtualElementManager
 
-        this.htmlInputEventManager = new HTMLInputEventManager(windowReference, () => windowLocationReferenceProducer(), (event) => textInputEventConsumer(event))
+    private readonly textChunkEventManager: TextChunkEventManager
+
+    constructor(windowReference: number, windowLocationReferenceProducer: () => number, textCaptureEventConsumer: (e: TextCaptureEvent) => void, elementRegistry: ElementRegistry) {
+
+        const consumeCapture = (text: string, type: string, elementReference: number) => {
+            const e = createTextCaptureEvent(text, type, windowReference, windowLocationReferenceProducer(), elementReference)
+            textCaptureEventConsumer(e)
+        }
+
+        this.htmlInputEventManager = new HTMLInputEventManager((text, type, reference) => consumeCapture(text, type, reference), elementRegistry)
+        this.textChunkEventManager = new TextChunkEventManager((text, type, reference) => consumeCapture(text, type, reference))
+        this.virtualElementManager = new VirtualElementManager(elementRegistry, (text, type, reference) => consumeCapture(text, type, reference))
 
         // Set up listeners for all events that could indicate text being inputted into the page
 
-        // input events
-        window.addEventListener("input", (e) => this.processEvent(e), { capture: true, once: false, passive: true })
+        // Input events. These indicate when the text content of HTML elements is worth a snapshot.
+        window.addEventListener("input", (e) => {
+            if (e instanceof InputEvent) {
+                this.htmlInputEventManager.handleInputEvent(e)
+            }
+        }, { capture: true, once: false, passive: true })
 
-        // keyboard events
-        window.addEventListener("keydown", (e) => this.processEvent(e), { capture: true, once: false, passive: true })
-        // Note: keyup seems redundant to the data you get in keydown
-        // window.addEventListener("keyup", (e) => this.processEvent(e), { capture: true, once: false, passive: true })
-
-        // composition events
-        // Note: composition events don't really seem to add any
-        //       additional data that we don't already get with other event types
-        //window.addEventListener("compositionstart", (e) => this.processEvent(e), { capture: true, once: false, passive: true })
-        //window.addEventListener("compositionupdate", (e) => this.processEvent(e), { capture: true, once: false, passive: true })
-        //window.addEventListener("compositionend", (e) => this.processEvent(e), { capture: true, once: false, passive: true })
+        // Keyboard events. Should only need keydown.
+        window.addEventListener("keydown", (e) => {
+            if (e instanceof KeyboardEvent) {
+                this.virtualElementManager.keyboardEvent(e)
+            }
+        }, { capture: true, once: false, passive: true })
 
         // clipboard events
-        window.addEventListener("paste", (e) => this.processEvent(e), { capture: true, once: false, passive: true })
+        window.addEventListener("paste", (e) => {
+            if (e instanceof ClipboardEvent) {
+                this.virtualElementManager.clipboardEvent(e)
+                this.textChunkEventManager.handlePasteEvent(e)
+            }
+        }, { capture: true, once: false, passive: true })
 
         // drag events
-        window.addEventListener("drag", (e) => this.processEvent(e), { capture: true, once: false, passive: true })
-        window.addEventListener("dragend", (e) => this.processEvent(e), { capture: true, once: false, passive: true })
-        window.addEventListener("dragenter", (e) => this.processEvent(e), { capture: true, once: false, passive: true })
-        window.addEventListener("dragstart", (e) => this.processEvent(e), { capture: true, once: false, passive: true })
-        window.addEventListener("dragleave", (e) => this.processEvent(e), { capture: true, once: false, passive: true })
-        window.addEventListener("dragover", (e) => this.processEvent(e), { capture: true, once: false, passive: true })
-        window.addEventListener("drop", (e) => this.processEvent(e), { capture: true, once: false, passive: true })
+        window.addEventListener("drag", (e) => this.textChunkEventManager.handleDragEvent(e), { capture: true, once: false, passive: true })
+        window.addEventListener("dragend", (e) => this.textChunkEventManager.handleDragEvent(e), { capture: true, once: false, passive: true })
+        window.addEventListener("dragenter", (e) => this.textChunkEventManager.handleDragEvent(e), { capture: true, once: false, passive: true })
+        window.addEventListener("dragstart", (e) => this.textChunkEventManager.handleDragEvent(e), { capture: true, once: false, passive: true })
+        window.addEventListener("dragleave", (e) => this.textChunkEventManager.handleDragEvent(e), { capture: true, once: false, passive: true })
+        window.addEventListener("dragover", (e) => this.textChunkEventManager.handleDragEvent(e), { capture: true, once: false, passive: true })
+
+        // drop actually shows intention that the text is part of a larger composition
+        // therefore handle it in the composition manager
+        window.addEventListener("drop", (e) => {
+            this.textChunkEventManager.handleDragEvent(e)
+            this.virtualElementManager.dragEvent(e)
+        }, { capture: true, once: false, passive: true })
 
 
     }
 
-    private processEvent(event: Event) {
-        // only consider events generated by the browser
-        // this should guard against adversarial web pages generating events to 
-        if (event.isTrusted) {
-            if (event instanceof InputEvent) {
-                this.htmlInputEventManager.trackTextInput(event)
-            } else if (event instanceof KeyboardEvent) {
-                this.processKeyboardEvent(event)
-            } else if (event instanceof CompositionEvent) {
-                this.processCompositionEvent(event)
-            } else if (event instanceof ClipboardEvent) {
-                this.processClipboardEvent(event)
-            } else if (event instanceof DragEvent) {
-                this.processDragEvent(event)
-            }
-        }
-    }
-
-    private processKeyboardEvent(keyboardEvent: KeyboardEvent) {
-        console.log(keyboardEvent.type)
-        console.log(keyboardEvent.key)
-        console.log(keyboardEvent.key)
-    }
-
-    private processCompositionEvent(compositionEvent: CompositionEvent) {
-        console.log(compositionEvent.type)
-        console.log(compositionEvent.data)
-    }
-
-    private processClipboardEvent(clipboardEvent: ClipboardEvent) {
-        console.log(clipboardEvent.type)
-        const paste = clipboardEvent.clipboardData?.getData('text');
-        console.log(paste)
-    }
-
-    private processDragEvent(dragEvent: DragEvent) {
-        const dataTransfer = dragEvent.dataTransfer
-        if (dataTransfer) {
-            const text: string = dataTransfer.getData("text")
-            if (text !== '') {
-                console.log(dragEvent.type)
-                console.log(text)
-            }
-        }
-    }
 }
-

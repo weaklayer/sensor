@@ -75,8 +75,9 @@ export class TextCaptureSessionManager {
 
         let session: TextCaptureSession | undefined = this.sessions.get(sessionId)
         if (session) {
-            this.interestingCaptureConsumer(session.getInterestingTextCaptures())
             this.sessions.delete(sessionId)
+            const captures = session.getInterestingTextCaptures()
+            this.interestingCaptureConsumer(captures)
         }
     }
 }

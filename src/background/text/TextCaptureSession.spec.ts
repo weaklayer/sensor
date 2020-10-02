@@ -53,4 +53,39 @@ suite('TextCaptureSession', () => {
         assert(events[1].text === 'hello', 'Incorrect second event')
         assert(events[2].text === 'he', 'Incorrect third event')
     })
+
+    test('Prunes with repeated strings at apex', async () => {
+        const textCaptureSession = new TextCaptureSession()
+
+        const event1 = createTextCaptureEvent('h', 'text', 22, 1, 2)
+        const event2 = createTextCaptureEvent('he', 'text', 22, 1, 2)
+        const event3 = createTextCaptureEvent('hel', 'text', 22, 1, 2)
+        const event4 = createTextCaptureEvent('hell', 'text', 22, 1, 2)
+        const event5 = createTextCaptureEvent('hello', 'text', 22, 1, 2)
+        const event6 = createTextCaptureEvent('hello', 'text', 22, 1, 2)
+        const event7 = createTextCaptureEvent('hello', 'text', 22, 1, 2)
+        const event8 = createTextCaptureEvent('hell', 'text', 22, 1, 2)
+        const event9 = createTextCaptureEvent('hel', 'text', 22, 1, 2)
+        const event10 = createTextCaptureEvent('he', 'text', 22, 1, 2)
+
+
+        // track out of order. should get sorted inside
+        textCaptureSession.trackTextCapture(event5)
+        textCaptureSession.trackTextCapture(event2)
+        textCaptureSession.trackTextCapture(event4)
+        textCaptureSession.trackTextCapture(event3)
+        textCaptureSession.trackTextCapture(event1)
+        textCaptureSession.trackTextCapture(event9)
+        textCaptureSession.trackTextCapture(event6)
+        textCaptureSession.trackTextCapture(event10)
+        textCaptureSession.trackTextCapture(event7)
+        textCaptureSession.trackTextCapture(event8)
+
+        const events = textCaptureSession.getInterestingTextCaptures()
+
+        assert(events.length === 3, 'Wrong number of interesting text Capture events')
+        assert(events[0].text === 'h', 'Incorrect first event')
+        assert(events[1].text === 'hello', 'Incorrect second event')
+        assert(events[2].text === 'he', 'Incorrect third event')
+    })
 })
