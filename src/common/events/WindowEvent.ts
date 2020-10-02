@@ -17,26 +17,38 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getEventTime, Event, isEvent } from './Event'
+import { getEventTime, Event, isEvent, isEventTime } from './Event'
 
 export const windowEventType = 'Window'
 
-export interface WindowEvent extends Event { }
+export interface WindowEvent extends Event {
+    isTopLevelWindow: boolean
+    topLevelWindowReference: number
+}
 
 export function createWindowEvent(): WindowEvent {
     return {
         type: windowEventType,
-        time: getEventTime()
+        time: getEventTime(),
+        isTopLevelWindow: false,
+        topLevelWindowReference: 0
     }
 }
 
 export function isWindowEvent(data: any): data is WindowEvent {
-    return isEvent(data) && data.type === windowEventType
+    const validEvent: boolean = isEvent(data) && data.type === windowEventType
+
+    const validIsTopLevelWindow: boolean = 'isTopLevelWindow' in data && typeof data.isTopLevelWindow === 'boolean'
+    const validTopLevelWindowReference: boolean = 'topLevelWindowReference' in data && typeof data.topLevelWindowReference === 'number' && isEventTime(data.topLevelWindowReference)
+
+    return validEvent && validIsTopLevelWindow && validTopLevelWindowReference
 }
 
 export function normalizeWindowEvent(event: WindowEvent): WindowEvent {
     return {
         type: windowEventType,
-        time: event.time
+        time: event.time,
+        isTopLevelWindow: event.isTopLevelWindow,
+        topLevelWindowReference: event.topLevelWindowReference,
     }
 }

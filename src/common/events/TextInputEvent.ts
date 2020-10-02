@@ -17,17 +17,24 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Event } from '../common/events/Event'
+import { Event } from './Event'
 
-export class ContentHub {
+export const textInputEventType = 'TextInput'
 
-    private readonly eventPort: browser.runtime.Port
+export interface TextInputEvent extends Event {
+    textHash: string
+    textLength: number
+    inputType: string
+    windowLocationReference: number
+}
 
-    constructor() {
-        this.eventPort = browser.runtime.connect({ name: "EventPort" })
-    }
-
-    submitEvent(event: Event): void {
-        this.eventPort.postMessage(event)
+export function createTextInputEvent(time: number, textHash: string, textLength: number, inputType: string, windowLocationReference: number): TextInputEvent {
+    return {
+        type: textInputEventType,
+        time: time,
+        textHash: textHash,
+        textLength: textLength,
+        inputType: inputType,
+        windowLocationReference: windowLocationReference
     }
 }

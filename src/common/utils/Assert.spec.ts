@@ -28,7 +28,7 @@ suite('Assert', () => {
     })
 
     test('Test failed assert', () => {
-        var flag = false
+        let flag = false
         try {
             assert(false, "Flag was false")
         } catch (e) {

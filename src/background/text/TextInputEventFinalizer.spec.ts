@@ -17,25 +17,21 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Semaphore } from './Semaphore'
 import { assert } from 'chai'
 import { test, suite } from 'mocha';
+import { TextInputEventFinalizer } from './TextInputEventFinalizer'
+import { fromByteArray } from 'base64-js'
+import { createTextCaptureEvent } from '../../common/events/internal/TextCaptureEvent';
 
-suite('Semaphore', () => {
+suite('TextInputEventFinalizer', () => {
+    test('Calculates hash', async () => {
+        const hash = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8])
+        const finalizer = new TextInputEventFinalizer(async (text) => hash)
 
-    test('Waiting on semaphore signal', async () => {
-        const s = new Semaphore()
-        let flag = false
+        const event = createTextCaptureEvent('hello', 'text', 22, 1, 2)
 
-        // set the semphore later in a seperate line of execution
-        setTimeout(() => {
-            flag = true
-            s.setSignal()
-        }, 1)
+        const finalizedEvents = await finalizer.processTextCaptureEvents([event])
 
-        await s.getSignal()
-
-        assert.strictEqual(flag, true, "Logic did not block until semaphore was set")
+        assert(finalizedEvents[0].textHash === fromByteArray(hash), 'Finalized text input event hash incorrect')
     })
-
 })

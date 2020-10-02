@@ -17,17 +17,22 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Event } from '../common/events/Event'
+export class KeyedHasher {
 
-export class ContentHub {
+    private readonly textEncoder: TextEncoder = new TextEncoder()
+    private readonly hashKeySupplier: () => Promise<Uint8Array>
 
-    private readonly eventPort: browser.runtime.Port
-
-    constructor() {
-        this.eventPort = browser.runtime.connect({ name: "EventPort" })
+    constructor(hashKeySupplier: () => Promise<Uint8Array>) {
+        this.hashKeySupplier = hashKeySupplier
     }
 
-    submitEvent(event: Event): void {
-        this.eventPort.postMessage(event)
+    async computeStringHash(text: string): Promise<Uint8Array> {
+        return this.computeBytesHash(this.textEncoder.encode(text))
+    }
+
+    async computeBytesHash(bytes: Uint8Array): Promise<Uint8Array> {
+        const hmacKey = crypto.subtle.importKey('raw', await this.hashKeySupplier(), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
+        const hash = await crypto.subtle.sign('HMAC', await hmacKey, bytes)
+        return new Uint8Array(hash)
     }
 }

@@ -33,14 +33,15 @@ export class EventCollector {
 
     private immediateTimer: number | undefined = undefined
 
-    constructor(eventsConsumer: (es: Array<Event>) => Promise<void>, overallTimeout: number = 5000, immediateTimeout: number = 500) {
+    constructor(eventsConsumer: (es: Array<Event>) => Promise<void>, overallTimeout: number = 10000, immediateTimeout: number = 1000) {
         this.eventsConsumer = eventsConsumer
         this.overallTimeout = overallTimeout
         this.immediateTimeout = immediateTimeout
     }
 
-    comsumeEvent(event: Event, w: WindowOrWorkerGlobalScope = window): void {
-        this.events.push(event)
+    consumeEvents(events: Array<Event>, w: WindowOrWorkerGlobalScope = window): void {
+
+        this.events.push(...events)
 
         if (!this.overallTimer) {
             // Hold onto events for 5s max before sending them off

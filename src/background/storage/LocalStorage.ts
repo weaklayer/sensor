@@ -19,14 +19,16 @@
 
 import { assert } from "../../common/utils/Assert"
 
-import { setStorageValue, getStorageValue } from './Storage'
+import { setStorageValue, getStorageValue, clearStorageValue, getStorageString } from './Storage'
 import { InstallResponse, isInstallResponse, normalizeInstallResponse } from "../install/InstallResponse"
+import { fromByteArray, toByteArray } from "base64-js"
 
 export class LocalStorage {
 
     private constructor() { }
 
     private static readonly installInfoKey = 'installInfo'
+    private static readonly textHashKeyKey = 'textHashKey'
 
     static async getInstallInfo(): Promise<InstallResponse> {
         const storageValue = await getStorageValue(LocalStorage.installInfoKey, k => browser.storage.local.get(k))
@@ -37,4 +39,18 @@ export class LocalStorage {
     static async setInstallInfo(installInfo: InstallResponse): Promise<void> {
         return setStorageValue(LocalStorage.installInfoKey, installInfo, (i) => browser.storage.local.set(i))
     }
+
+    static async getTextHashKey(): Promise<Uint8Array> {
+        const storageValue: string = await getStorageString(LocalStorage.textHashKeyKey, /^[A-Za-z0-9+/]{86}==$/, k => browser.storage.local.get(k))
+        return toByteArray(storageValue)
+    }
+
+    static async setTextHashKey(textHashKey: Uint8Array): Promise<void> {
+        return setStorageValue(LocalStorage.textHashKeyKey, fromByteArray(textHashKey), (i) => browser.storage.local.set(i))
+    }
+
+    static async clearTextHashKey(): Promise<void> {
+        return clearStorageValue(LocalStorage.textHashKeyKey, k => browser.storage.local.remove(k))
+    }
+
 }

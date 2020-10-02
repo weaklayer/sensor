@@ -17,17 +17,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Event } from '../common/events/Event'
+export class WindowMetadata {
 
-export class ContentHub {
+    readonly tabId?: number
+    readonly frameId?: number
 
-    private readonly eventPort: browser.runtime.Port
-
-    constructor() {
-        this.eventPort = browser.runtime.connect({ name: "EventPort" })
-    }
-
-    submitEvent(event: Event): void {
-        this.eventPort.postMessage(event)
+    constructor(tabId?: number, frameId?: number) {
+        this.tabId = tabId
+        this.frameId = frameId
     }
 }

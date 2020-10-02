@@ -17,17 +17,20 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Event } from '../common/events/Event'
+import { getEventTime } from "../common/events/Event"
 
-export class ContentHub {
+export class ElementRegistry {
 
-    private readonly eventPort: browser.runtime.Port
+    private readonly elementReferences: Map<EventTarget, number> = new Map<Node, number>()
 
-    constructor() {
-        this.eventPort = browser.runtime.connect({ name: "EventPort" })
-    }
+    getElementReference(element: EventTarget): number {
+        let reference = this.elementReferences.get(element)
+        if (reference) {
+            return reference
+        }
 
-    submitEvent(event: Event): void {
-        this.eventPort.postMessage(event)
+        reference = getEventTime()
+        this.elementReferences.set(element, reference)
+        return reference
     }
 }

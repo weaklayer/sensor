@@ -34,11 +34,11 @@ suite('WindowLocationEventGeneration', () => {
         })
 
         const semaphore1 = new Semaphore()
-        var semaphore1set = false
+        let semaphore1set = false
         const semaphore2 = new Semaphore()
 
-        var event1: WindowLocationEvent | undefined = undefined
-        var event2: WindowLocationEvent | undefined = undefined
+        let event1: WindowLocationEvent | undefined = undefined
+        let event2: WindowLocationEvent | undefined = undefined
 
         const generator = new WindowLocationEventGenerator(1, () => fakeDom.window.location, (e) => {
             if (!semaphore1set) {

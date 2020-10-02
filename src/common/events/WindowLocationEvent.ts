@@ -66,8 +66,8 @@ export function createWindowLocationEvent(windowReference: number, windowLocatio
     const protocol: string = location.protocol.replace(/:$/, '') // trim the tailing colon from this api call
     const hostname: string = location.hostname
 
-    var port: number = 0
-    var parsedPort: number = parseInt(location.port)
+    let port: number = 0
+    const parsedPort: number = parseInt(location.port)
     if (!isNaN(parsedPort)) {
         // use the explicitly set port if there is one
         port = parsedPort

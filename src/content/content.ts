@@ -20,12 +20,22 @@
 import { ContentHub } from './ContentHub'
 import { WindowEvent, createWindowEvent } from '../common/events/WindowEvent'
 import { WindowLocationEventGenerator } from './WindowLocationEventGenerator'
+import { TextInputEventManager } from './text/TextInputEventManager'
+import { ElementRegistry } from './ElementRegistry'
 
 // We hold onto this event here as most events in this window will link to it
 const windowEvent: WindowEvent = createWindowEvent()
-
 const contentHub = new ContentHub()
 
 contentHub.submitEvent(windowEvent)
 
 const windowLocationEventGenerator = new WindowLocationEventGenerator(windowEvent.time, () => window.location, (e) => contentHub.submitEvent(e))
+
+const elementRegistry = new ElementRegistry()
+
+const textInputEventManager = new TextInputEventManager(
+    windowEvent.time,
+    () => windowLocationEventGenerator.getCurrentWindowLocationReference(),
+    (event) => contentHub.submitEvent(event),
+    elementRegistry
+)
