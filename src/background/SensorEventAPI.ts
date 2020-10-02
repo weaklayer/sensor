@@ -37,6 +37,7 @@ export class SensorEventAPI {
             return
         }
 
+        // This will throw if things go bad with authentication (network error or failing response code)
         const headers = await this.getHeaders()
 
         const sensorApiBaseUrl: string = await ManagedStorage.getSensorApiEndpoint()
@@ -49,7 +50,7 @@ export class SensorEventAPI {
             headers: headers
         })
 
-        // Non-200 code means that we could
+        // Non 2XX. Didn't work. Throw so we can retry
         if (response.status < 200 || 300 <= response.status) {
             if (400 <= response.status && response.status < 500) {
                 // With 4XX there was an auth problem. Attempt reinstall on the next go.
