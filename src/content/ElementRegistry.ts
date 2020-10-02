@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { getEventTime } from "../common/events/Event"
-
 // Copyright (C) 2020 Mitchell Wasson
 
 // This file is part of Weaklayer Sensor.
@@ -18,6 +16,8 @@ import { getEventTime } from "../common/events/Event"
 
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+import { getEventTime } from "../common/events/Event"
 
 export class ElementRegistry {
 

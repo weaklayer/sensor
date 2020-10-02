@@ -75,7 +75,7 @@ export class TextInputEventManager {
         window.addEventListener("dragover", (e) => this.textChunkEventManager.handleDragEvent(e), { capture: true, once: false, passive: true })
 
         // drop actually shows intention that the text is part of a larger composition
-        // therefore handle it in the composition manager
+        // therefore handle in a virtual element as well
         window.addEventListener("drop", (e) => {
             this.textChunkEventManager.handleDragEvent(e)
             this.virtualElementManager.dragEvent(e)
