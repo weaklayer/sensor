@@ -37,19 +37,27 @@ export class SensorEventAPI {
             return
         }
 
+        // This will throw if things go bad with authentication (network error or failing response code)
         const headers = await this.getHeaders()
 
         const sensorApiBaseUrl: string = await ManagedStorage.getSensorApiEndpoint()
         const eventUrl = `${sensorApiBaseUrl}/events`
 
+        // This will throw if things go bad
         const response = await fetch(eventUrl, {
             method: 'POST',
             body: JSON.stringify(events),
             headers: headers
         })
 
+        // Non 2XX. Didn't work. Throw so we can retry
         if (response.status < 200 || 300 <= response.status) {
-            console.warn(`Received response code ${response.status} for event submission.`)
+            if (400 <= response.status && response.status < 500) {
+                // With 4XX there was an auth problem. Attempt reinstall on the next go.
+                this.installer.forceReinstall()
+            }
+
+            throw new Error(`Received response code ${response.status} for event submission.`)
         }
     }
 
