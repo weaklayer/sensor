@@ -47,7 +47,7 @@ export class SensorEventAPI {
         // This will throw if things go bad
         const response = await fetch(eventUrl, {
             method: 'POST',
-            body: gzip(JSON.stringify(events), { to: undefined }),
+            body: gzip(JSON.stringify(events)),
             headers: headers
         })
 
