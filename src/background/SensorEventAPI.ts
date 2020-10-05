@@ -20,6 +20,7 @@
 import { ManagedStorage } from './storage/ManagedStorage'
 import { Installer } from './install/Installer'
 import { Event } from '../common/events/Event'
+import { gzip } from 'pako'
 
 export class SensorEventAPI {
 
@@ -46,7 +47,7 @@ export class SensorEventAPI {
         // This will throw if things go bad
         const response = await fetch(eventUrl, {
             method: 'POST',
-            body: JSON.stringify(events),
+            body: gzip(JSON.stringify(events), { to: undefined }),
             headers: headers
         })
 
@@ -65,6 +66,7 @@ export class SensorEventAPI {
         const token = await this.installer.getAuthorizationToken()
         return new Headers({
             'Content-Type': 'application/json',
+            'Content-Encoding': 'gzip',
             'Authorization': `Bearer ${token}`
         })
     }
