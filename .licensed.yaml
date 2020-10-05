@@ -11,3 +11,7 @@ allowed:
   - cc0-1.0
   - isc
   - mpl-2.0
+
+reviewed:
+  npm:
+    - pako
