@@ -68,6 +68,8 @@ suite('WindowLocationEvent', () => {
         const windowRef = 1
         const event: WindowLocationEvent = createWindowLocationEvent(windowRef, () => w.location)
 
-        assert.strictEqual(event.port, 0, "Port set to non-zero value by default")
+        console.log(JSON.stringify(event))
+
+        assert.isFalse('port' in event && event.port !== undefined, "Port exists in event by default")
     })
 })
