@@ -24,7 +24,7 @@ export const windowLocationEventType = 'WindowLocation'
 export interface WindowLocationEvent extends Event {
     protocol: string
     hostname: string
-    port: number
+    port?: number
     path: string
     search: string
     hash: string
@@ -35,7 +35,8 @@ export function isWindowLocationEvent(data: any): data is WindowLocationEvent {
     const validEvent: boolean = isEvent(data) && data.type === windowLocationEventType
     const validProtocol: boolean = 'protocol' in data && typeof data.protocol === 'string'
     const validHostname: boolean = 'hostname' in data && typeof data.hostname === 'string'
-    const validPort: boolean = 'port' in data && typeof data.port === 'number' && data.port >= 0 && data.port <= 65535
+    const portPresent = 'port' in data && data.port !== undefined
+    const validPort: boolean = !portPresent || (portPresent && typeof data.port === 'number' && data.port >= 0 && data.port <= 65535)
     const validPath: boolean = 'path' in data && typeof data.path === 'string'
     const validSearch: boolean = 'search' in data && typeof data.search === 'string'
     const validHash: boolean = 'hash' in data && typeof data.hash === 'string'
@@ -66,7 +67,7 @@ export function createWindowLocationEvent(windowReference: number, windowLocatio
     const protocol: string = location.protocol.replace(/:$/, '') // trim the tailing colon from this api call
     const hostname: string = location.hostname
 
-    let port: number = 0
+    let port: number | undefined
     const parsedPort: number = parseInt(location.port)
     if (!isNaN(parsedPort)) {
         // use the explicitly set port if there is one
