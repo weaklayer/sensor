@@ -1,7 +1,7 @@
 {
     "name": "Weaklayer Sensor",
     "author": "Weaklayer",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "description": "Browser Detection and Response",
     "manifest_version": 2,
     "icons": {
