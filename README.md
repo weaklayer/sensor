@@ -1,5 +1,7 @@
 # Weaklayer Sensor
 
+**N.B.** As of early 2021, this project is no longer under active development and has been removed from browser extension stores. However, the Weaklayer sensor and gateway still work well at the time of writing. The sensor just requires installing from source now.
+
 Welcome to the Weaklayer Sensor repository!
 Weaklayer is a software system for Browser Detection and Response - like Endpoint Detection and Reponse (EDR) but in the browser.
 The Weaklayer Sensor (a browser extension) collects and sends security data to a Weaklayer Gateway instance you are running.
@@ -7,14 +9,14 @@ The Weaklayer Sensor (a browser extension) collects and sends security data to a
 The Weaklayer Sensor is written against the WebExtensions API using the [Mozilla WebExtension Polyfill](https://github.com/mozilla/webextension-polyfill).
 Here is a compatibility table for the Weaklayer Sensor and the browsers that implement this technology.
 
-| Browser | Supported | Minimum Version | Store Link | Notes |
-|---------|-----------|-----------------|------------|-------|
-| Firefox (Desktop)  | &#x2611; | 57  | [Mozilla Addons Store](https://addons.mozilla.org/firefox/addon/weaklayer-sensor/)   | - |
-| Firefox (Android)  | &#x2612; | - | - | Firefox on Android does support extensions, but it does not support the [Managed Storage API](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/storage/managed). |
-| Chrome | &#x2611; | 51 | [Chrome Web Store](https://chrome.google.com/webstore/detail/weaklayer-sensor/joancbgicjhnjkkknlpablgmdcgcpnhj) | - |
-| Edge | &#x2611; | 79 | [Microsoft Store for Edge](https://microsoftedge.microsoft.com/addons/detail/weaklayer-sensor/kngkbghmgoehankpjifhjjglibcickjb) | Edge on MacOS support is not available since managed storage is not functioning as expected on this platform. |
-| Opera | &#x2612; | - | - | Opera does not support the [Managed Storage API](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/storage/managed) according to MDN. It might work still since Opera is Chromium-based. Please create a Github issue if this is important to you. |
-| Safari | &#x2612; | - | - | Safari 14 will have WebExtensions so this should be possible in the future. |
+| Browser | Supported | Minimum Version | Notes |
+|---------|-----------|-----------------|-------|
+| Firefox (Desktop)  | &#x2611; | 57  |  - |
+| Firefox (Android)  | &#x2612; | - |
+| Chrome | &#x2611; | 51 | - |
+| Edge | &#x2611; | 79 | Edge on MacOS support is not available since managed storage is not functioning as expected on this platform. |
+| Opera | &#x2612; | - | Opera does not support the [Managed Storage API](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/storage/managed) according to MDN. It might work still since Opera is Chromium-based. Please create a Github issue if this is important to you. |
+| Safari | &#x2612; | - | Safari 14 will have WebExtensions so this should be possible in the future. |
 
 ## Usage
 
